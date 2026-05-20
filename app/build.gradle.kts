@@ -56,13 +56,12 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    // 1. Room Database (Untuk Sleep Journal)
+
     // 1. Room Database (Untuk Sleep Journal)
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-
-    // SEKARANG MENGGUNAKAN KSP (Sudah tidak error merah lagi):
+    
     "ksp"("androidx.room:room-compiler:$roomVersion")
 
     // 2. Google Gemini API SDK (Untuk NatunAI)
