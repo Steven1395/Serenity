@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
 }
 
 android {
@@ -55,4 +56,20 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // 1. Room Database (Untuk Sleep Journal)
+    // 1. Room Database (Untuk Sleep Journal)
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+
+    // SEKARANG MENGGUNAKAN KSP (Sudah tidak error merah lagi):
+    "ksp"("androidx.room:room-compiler:$roomVersion")
+
+    // 2. Google Gemini API SDK (Untuk NatunAI)
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    // 3. Jetpack Media3 ExoPlayer (Untuk Musik Naptune)
+    val media3Version = "1.3.1"
+    implementation("androidx.media3:media3-exoplayer:$media3Version")
+    implementation("androidx.media3:media3-ui:$media3Version")
 }
