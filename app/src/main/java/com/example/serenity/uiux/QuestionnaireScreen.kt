@@ -1,17 +1,35 @@
 package com.example.serenity.uiux
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.serenity.R
 
 @Composable
 fun QuestionnaireScreen() {
+    // 1. Definisi Warna Ungu dari Desain
+    val DeepPurple = Color(0xFF422C73)
+
+    // 2. Definisi Font Poppins
+    val PoppinsFont = try {
+        FontFamily(
+            Font(R.font.poppins_regular, FontWeight.Normal),
+            Font(R.font.poppins_bold, FontWeight.Bold)
+        )
+    } catch (e: Exception) {
+        FontFamily.Default
+    }
+
     val questions = remember {
         listOf(
             "Apakah kamu sering menggunakan smartphone?\n(lebih dari 4 jam per hari)",
@@ -22,33 +40,40 @@ fun QuestionnaireScreen() {
     }
 
     val answers = remember { mutableStateListOf(*Array(questions.size) { "" }) }
-
     var currentQuestionIndex by remember { mutableIntStateOf(0) }
     var isFinished by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .padding(horizontal = 24.dp, vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (!isFinished) {
+            // JUDUL
             Text(
-                text = "Kuesioner Harian (${currentQuestionIndex + 1}/${questions.size})",
-                fontSize = 24.sp,
+                text = "Kuisioner Harian",
+                fontFamily = PoppinsFont,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 32.dp)
+                color = DeepPurple,
+                modifier = Modifier.padding(top = 24.dp)
             )
 
-            // Pertanyaan menggunakan rata tengah (Center)
+            // Pendorong elastis agar pertanyaan pas di tengah
+            Spacer(modifier = Modifier.weight(1f))
+
+            // TEKS PERTANYAAN
             Text(
                 text = questions[currentQuestionIndex],
+                fontFamily = PoppinsFont,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 24.dp)
+                color = DeepPurple,
+                modifier = Modifier.padding(bottom = 40.dp)
             )
 
+            // PILIHAN JAWABAN (RADIO BUTTON)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -56,21 +81,30 @@ fun QuestionnaireScreen() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
                         selected = (answers[currentQuestionIndex] == "Ya"),
-                        onClick = { answers[currentQuestionIndex] = "Ya" }
+                        onClick = { answers[currentQuestionIndex] = "Ya" },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = DeepPurple,
+                            unselectedColor = DeepPurple
+                        )
                     )
-                    Text(text = "Ya")
+                    Text(text = "Ya", fontFamily = PoppinsFont, color = DeepPurple)
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
                         selected = (answers[currentQuestionIndex] == "Tidak"),
-                        onClick = { answers[currentQuestionIndex] = "Tidak" }
+                        onClick = { answers[currentQuestionIndex] = "Tidak" },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = DeepPurple,
+                            unselectedColor = DeepPurple
+                        )
                     )
-                    Text(text = "Tidak")
+                    Text(text = "Tidak", fontFamily = PoppinsFont, color = DeepPurple)
                 }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            // Pendorong elastis agar tombol turun ke bawah
+            Spacer(modifier = Modifier.weight(1.2f))
 
             val onNextClick: () -> Unit = {
                 if (currentQuestionIndex < questions.size - 1) {
@@ -81,47 +115,80 @@ fun QuestionnaireScreen() {
                 }
             }
 
+            // TOMBOL NAVIGASI
             if (currentQuestionIndex == 0) {
                 Button(
                     onClick = onNextClick,
                     enabled = answers[currentQuestionIndex].isNotEmpty(),
-                    modifier = Modifier.fillMaxWidth(0.9f)
+                    colors = ButtonDefaults.buttonColors(containerColor = DeepPurple),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .height(56.dp)
                 ) {
-                    Text(text = "Selanjutnya")
+                    Text(
+                        text = "Selanjutnya",
+                        fontFamily = PoppinsFont,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 }
             } else {
-
                 Row(
                     modifier = Modifier.fillMaxWidth(0.9f),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     OutlinedButton(
                         onClick = { currentQuestionIndex-- },
-                        modifier = Modifier.weight(1f).padding(end = 8.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .padding(end = 8.dp)
                     ) {
-                        Text(text = "Kembali")
+                        Text(
+                            text = "Kembali",
+                            fontFamily = PoppinsFont,
+                            color = DeepPurple,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     Button(
                         onClick = onNextClick,
                         enabled = answers[currentQuestionIndex].isNotEmpty(),
-                        modifier = Modifier.weight(1f).padding(start = 8.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = DeepPurple),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .padding(start = 8.dp)
                     ) {
                         Text(
-                            text = if (currentQuestionIndex == questions.size - 1) "Selesai" else "Selanjutnya"
+                            text = if (currentQuestionIndex == questions.size - 1) "Selesai" else "Selanjutnya",
+                            fontFamily = PoppinsFont,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
         } else {
+            // TAMPILAN SELESAI
             Text(
                 text = "Terima Kasih!",
+                fontFamily = PoppinsFont,
+                color = DeepPurple,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
                 text = "Data kuesioner berhasil dianalisis oleh Natuna AI untuk mengoptimalkan tidurmu.\n\nHasil: ${answers.toList()}",
+                fontFamily = PoppinsFont,
+                color = DeepPurple,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
