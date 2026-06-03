@@ -13,7 +13,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.naptune"
+        applicationId = "com.example.serenity"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -67,7 +67,7 @@ dependencies {
     // 2. Google Gemini API SDK (Untuk NatunAI)
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 
-    // 3. Jetpack Media3 ExoPlayer (Untuk Musik Naptune)
+    // 3. Jetpack Media3 ExoPlayer (Untuk Musik Serenity)
     val media3Version = "1.3.1"
     implementation("androidx.media3:media3-exoplayer:$media3Version")
     implementation("androidx.media3:media3-ui:$media3Version")
