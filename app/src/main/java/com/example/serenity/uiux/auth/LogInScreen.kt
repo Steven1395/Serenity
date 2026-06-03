@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LogInScreen() {
+fun LogInScreen(onLoginSuccess: () -> Unit) { // <-- Parameter ini yang tadi dicariin sama MainActivity
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -79,7 +79,7 @@ fun LogInScreen() {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { /* Handle Login */ },
+                    onClick = onLoginSuccess, // <-- Dan ini eksekutor tombolnya biar bisa pindah halaman
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
