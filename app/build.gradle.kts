@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.naptune"
+    namespace = "com.example.serenity"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1

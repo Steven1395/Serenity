@@ -1,4 +1,4 @@
-package com.example.naptune.ui.theme
+package com.example.serenity.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

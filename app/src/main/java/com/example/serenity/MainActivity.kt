@@ -1,4 +1,4 @@
-package com.example.naptune
+package com.example.serenity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.naptune.ui.theme.NaptuneTheme
-import com.example.naptune.uiux.QuestionnaireScreen // Mengimpor layar yang udah kamu buat
+import com.example.serenity.ui.theme.NaptuneTheme
+import com.example.serenity.uiux.QuestionnaireScreen // Mengimpor layar yang udah kamu buat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

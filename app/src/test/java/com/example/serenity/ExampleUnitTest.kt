@@ -1,4 +1,4 @@
-package com.example.naptune
+package com.example.serenity
 
 import org.junit.Test
 

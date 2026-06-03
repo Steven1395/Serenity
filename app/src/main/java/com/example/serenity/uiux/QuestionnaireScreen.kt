@@ -1,10 +1,11 @@
-package com.example.naptune.uiux
+package com.example.serenity.uiux
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -13,18 +14,16 @@ import androidx.compose.ui.unit.sp
 fun QuestionnaireScreen() {
     val questions = remember {
         listOf(
-            "Apakah kamu sering menggunakan smartphone? (lebih dari 4 jam perhari)",
+            "Apakah kamu sering menggunakan smartphone?\n(lebih dari 4 jam per hari)",
             "Apakah kamu mengonsumsi kafein atau kopi dalam 6 jam sebelum tidur?",
             "Apakah jadwal tidurmu teratur dalam 3 hari terakhir?",
             "Apakah kamu merasa segar saat bangun tidur pagi ini?"
         )
     }
 
-    // 1. State untuk menyimpan seluruh jawaban (awalnya kosong semua)
-    // mutableStateListOf memastikan UI otomatis update kalau ada jawaban yang diubah
     val answers = remember { mutableStateListOf(*Array(questions.size) { "" }) }
 
-    var currentQuestionIndex by remember { mutableStateOf(0) }
+    var currentQuestionIndex by remember { mutableIntStateOf(0) }
     var isFinished by remember { mutableStateOf(false) }
 
     Column(
@@ -42,9 +41,11 @@ fun QuestionnaireScreen() {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
+            // Pertanyaan menggunakan rata tengah (Center)
             Text(
                 text = questions[currentQuestionIndex],
                 fontSize = 18.sp,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -54,65 +55,65 @@ fun QuestionnaireScreen() {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
-                        // Cek jawaban spesifik di indeks saat ini
-                        selected = (answers[currentQuestionIndex] == "Yes"),
-                        onClick = { answers[currentQuestionIndex] = "Yes" }
+                        selected = (answers[currentQuestionIndex] == "Ya"),
+                        onClick = { answers[currentQuestionIndex] = "Ya" }
                     )
-                    Text(text = "Yes")
+                    Text(text = "Ya")
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(
-                        // Cek jawaban spesifik di indeks saat ini
-                        selected = (answers[currentQuestionIndex] == "No"),
-                        onClick = { answers[currentQuestionIndex] = "No" }
+                        selected = (answers[currentQuestionIndex] == "Tidak"),
+                        onClick = { answers[currentQuestionIndex] = "Tidak" }
                     )
-                    Text(text = "No")
+                    Text(text = "Tidak")
                 }
             }
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // 2. Barisan Tombol Bawah (Back dan Next)
-            Row(
-                modifier = Modifier.fillMaxWidth(0.9f),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Tombol Back (Hanya dirender kalau bukan di pertanyaan pertama)
-                if (currentQuestionIndex > 0) {
+            val onNextClick: () -> Unit = {
+                if (currentQuestionIndex < questions.size - 1) {
+                    currentQuestionIndex++
+                } else {
+                    isFinished = true
+                    println("Semua jawaban disimpan: ${answers.toList()}")
+                }
+            }
+
+            if (currentQuestionIndex == 0) {
+                Button(
+                    onClick = onNextClick,
+                    enabled = answers[currentQuestionIndex].isNotEmpty(),
+                    modifier = Modifier.fillMaxWidth(0.9f)
+                ) {
+                    Text(text = "Selanjutnya")
+                }
+            } else {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     OutlinedButton(
                         onClick = { currentQuestionIndex-- },
                         modifier = Modifier.weight(1f).padding(end = 8.dp)
                     ) {
-                        Text(text = "Back")
+                        Text(text = "Kembali")
                     }
-                } else {
-                    // Spacer kosong agar tombol Next tetap di kanan dan ukurannya konsisten
-                    Spacer(modifier = Modifier.weight(1f).padding(end = 8.dp))
-                }
 
-                // Tombol Next / Finish
-                Button(
-                    onClick = {
-                        if (currentQuestionIndex < questions.size - 1) {
-                            currentQuestionIndex++
-                        } else {
-                            isFinished = true
-                            // Tampilkan semua jawaban di Logcat saat selesai
-                            println("Semua jawaban disimpan: ${answers.toList()}")
-                        }
-                    },
-                    // Tombol mati kalau jawaban di nomor ini masih kosong
-                    enabled = answers[currentQuestionIndex].isNotEmpty(),
-                    modifier = Modifier.weight(1f).padding(start = 8.dp)
-                ) {
-                    Text(
-                        text = if (currentQuestionIndex == questions.size - 1) "Finish" else "Next Question"
-                    )
+                    Button(
+                        onClick = onNextClick,
+                        enabled = answers[currentQuestionIndex].isNotEmpty(),
+                        modifier = Modifier.weight(1f).padding(start = 8.dp)
+                    ) {
+                        Text(
+                            text = if (currentQuestionIndex == questions.size - 1) "Selesai" else "Selanjutnya"
+                        )
+                    }
                 }
             }
         } else {
-            // Halaman Selesai
             Text(
                 text = "Terima Kasih!",
                 fontSize = 28.sp,
@@ -122,6 +123,7 @@ fun QuestionnaireScreen() {
             Text(
                 text = "Data kuesioner berhasil dianalisis oleh Natuna AI untuk mengoptimalkan tidurmu.\n\nHasil: ${answers.toList()}",
                 fontSize = 16.sp,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }

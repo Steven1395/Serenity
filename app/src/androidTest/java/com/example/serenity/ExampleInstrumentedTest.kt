@@ -1,4 +1,4 @@
-package com.example.naptune
+package com.example.serenity
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
