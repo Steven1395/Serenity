@@ -20,10 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Palet warna yang diekstrak dari gambar mock-up
-val TextDarkPurple = Color(0xFF2B2250UL)
-val LightLavenderBg = Color(0xFFD2CFFCUL)
-val ProfileLavender = Color(0xFF8884D8UL)
+// 1. PERBAIKAN WARNA: Menghapus huruf 'UL' di akhir
+val TextDarkPurple = Color(0xFF2B2250)
+val LightLavenderBg = Color(0xFFD2CFFC)
+val ProfileLavender = Color(0xFF8884D8)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,47 +100,52 @@ fun DashboardScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- DAFTAR MENU ---
+// --- DAFTAR MENU ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = LightLavenderBg),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            Column {
-                DashboardMenuItem(icon = Icons.Default.Assignment, title = "Kuisioner Aktivitas") {
-                    // TODO: Navigasi ke Kuesioner
-                }
-                HorizontalDivider(color = Color.White, thickness = 1.dp)
+            // Menggunakan Icons.Default.List sebagai pengganti Assignment
+            DashboardMenuItem(icon = Icons.Default.List, title = "Kuisioner Aktivitas") {
+                // TODO: Navigasi ke Kuesioner
+            }
+            HorizontalDivider(color = Color.White, thickness = 1.dp)
 
-                DashboardMenuItem(icon = Icons.Default.Bedtime, title = "Pantauan Tidur") {
-                    // TODO: Navigasi ke Pantauan Tidur
-                }
-                HorizontalDivider(color = Color.White, thickness = 1.dp)
+            // Menggunakan Icons.Default.Star sebagai pengganti Bedtime (karena berhubungan dengan malam)
+            DashboardMenuItem(icon = Icons.Default.Star, title = "Pantauan Tidur") {
+                // TODO: Navigasi ke Pantauan Tidur
+            }
+            HorizontalDivider(color = Color.White, thickness = 1.dp)
 
-                DashboardMenuItem(icon = Icons.Default.SmartToy, title = "Tanya NatunAI") {
-                    // TODO: Navigasi ke NatunAI
-                }
-                HorizontalDivider(color = Color.White, thickness = 1.dp)
+            // Menggunakan Icons.Default.Face sebagai pengganti SmartToy/Robot (mewakili AI)
+            DashboardMenuItem(icon = Icons.Default.Face, title = "Tanya NatunAI") {
+                // TODO: Navigasi ke NatunAI
+            }
+            HorizontalDivider(color = Color.White, thickness = 1.dp)
 
-                DashboardMenuItem(icon = Icons.Default.MusicNote, title = "Musik Serenity") {
-                    // TODO: Navigasi ke Musik
-                }
-                HorizontalDivider(color = Color.White, thickness = 1.dp)
+            // Menggunakan Icons.Default.PlayArrow sebagai pengganti MusicNote
+            DashboardMenuItem(icon = Icons.Default.PlayArrow, title = "Musik Serenity") {
+                // TODO: Navigasi ke Musik
+            }
+            HorizontalDivider(color = Color.White, thickness = 1.dp)
 
-                DashboardMenuItem(icon = Icons.Default.Settings, title = "Pengaturan") {
-                    // TODO: Navigasi ke Pengaturan
-                }
-                HorizontalDivider(color = Color.White, thickness = 1.dp)
+            // Settings sudah ada di Core bawaan
+            DashboardMenuItem(icon = Icons.Default.Settings, title = "Pengaturan") {
+                // TODO: Navigasi ke Pengaturan
+            }
+            HorizontalDivider(color = Color.White, thickness = 1.dp)
 
-                DashboardMenuItem(icon = Icons.Default.Help, title = "Bantuan") {
-                    // TODO: Navigasi ke Bantuan
-                }
-                HorizontalDivider(color = Color.White, thickness = 1.dp)
+            // Menggunakan Icons.Default.Info untuk Bantuan
+            DashboardMenuItem(icon = Icons.Default.Info, title = "Bantuan") {
+                // TODO: Navigasi ke Bantuan
+            }
+            HorizontalDivider(color = Color.White, thickness = 1.dp)
 
-                DashboardMenuItem(icon = Icons.Default.Info, title = "Tentang Kami") {
-                    // TODO: Navigasi ke Tentang Kami
-                }
+            // Info sudah ada di Core bawaan
+            DashboardMenuItem(icon = Icons.Default.Info, title = "Tentang Kami") {
+                // TODO: Navigasi ke Tentang Kami
             }
         }
 
