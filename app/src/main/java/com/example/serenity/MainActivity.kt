@@ -17,6 +17,7 @@ import com.example.serenity.ui.theme.NaptuneTheme
 import com.example.serenity.uiux.QuestionnaireScreen
 import com.example.serenity.uiux.auth.LandingScreen
 import com.example.serenity.uiux.auth.LogInScreen
+import com.example.serenity.uiux.auth.SignInScreen // Tambahan Import
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,16 +28,19 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
 
-                        // State pengatur jalan cerita layar (Dimulai dari "landing")
                         var currentScreen by remember { mutableStateOf("landing") }
 
-                        // Logika perpindahan halamannya di sini
+                        // Alur Navigasi Lengkap
                         when (currentScreen) {
                             "landing" -> LandingScreen(
                                 onGetStartedClick = { currentScreen = "login" }
                             )
                             "login" -> LogInScreen(
-                                onLoginSuccess = { currentScreen = "questionnaire" }
+                                onLoginSuccess = { currentScreen = "questionnaire" },
+                                onNavigateToSignIn = { currentScreen = "signin" } // Navigasi ke Sign In
+                            )
+                            "signin" -> SignInScreen(
+                                onContinueClick = { currentScreen = "questionnaire" }
                             )
                             "questionnaire" -> QuestionnaireScreen()
                         }
