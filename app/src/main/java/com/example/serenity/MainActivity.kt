@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.serenity.ui.theme.NaptuneTheme
 import com.example.serenity.uiux.QuestionnaireScreen // Mengimpor layar yang udah kamu buat
+import com.example.serenity.uiux.dashboard.DashboardScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
             NaptuneTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        QuestionnaireScreen()
+                        DashboardScreen()
                     }
                 }
             }
