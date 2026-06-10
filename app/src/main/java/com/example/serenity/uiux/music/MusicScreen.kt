@@ -153,7 +153,7 @@ fun MusicScreen() {
                     )
                 }
             }
-        } // <--- INI KURUNG KURAWAL YANG TADI HILANG!
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

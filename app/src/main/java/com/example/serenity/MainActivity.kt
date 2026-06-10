@@ -19,7 +19,8 @@ import com.example.serenity.uiux.auth.SignInScreen
 import com.example.serenity.uiux.dashboard.DashboardScreen
 import com.example.serenity.uiux.music.MusicScreen
 import com.example.serenity.uiux.natunai.AiScreen
-import com.example.serenity.uiux.QuestionnaireScreen // Pastikan lokasi import ini sesuai
+import com.example.serenity.uiux.QuestionnaireScreen
+import com.example.serenity.uiux.journal.JournalScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +61,9 @@ class MainActivity : ComponentActivity() {
                             "dashboard" -> {
                                 DashboardScreen(
                                     onNavigateToMusic = { currentScreen = "music" },
-                                    onNavigateToAi = { currentScreen = "ai" }
+                                    onNavigateToAi = { currentScreen = "ai" },
+                                    onNavigateToJournal = { currentScreen = "journal"},
+                                    onNavigateToQuestionnaire = { currentScreen = "questionnaire"}
                                 )
                             }
                             "music" -> {
@@ -70,6 +73,9 @@ class MainActivity : ComponentActivity() {
                                 AiScreen(
                                     onNavigateBack = { currentScreen = "dashboard" }
                                 )
+                            }
+                            "journal" -> {
+                                JournalScreen()
                             }
                         }
 

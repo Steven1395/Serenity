@@ -62,13 +62,6 @@ fun JournalScreen() {
                     tint = TextWhite
                 )
             }
-            Text(
-                text = "Back",
-                fontFamily = PoppinsFont,
-                color = TextWhite,
-                fontSize = 16.sp,
-                modifier = Modifier.padding(start = 8.dp)
-            )
         }
 
         Text(

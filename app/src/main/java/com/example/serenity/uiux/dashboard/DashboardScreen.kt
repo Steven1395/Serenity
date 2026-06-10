@@ -28,8 +28,10 @@ val ProfileLavender = Color(0xFF8884D8)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    onNavigateToMusic: () -> Unit, // <--- 1. Tambahkan parameter navigasi ke Musik
-    onNavigateToAi: () -> Unit     // <--- 2. Tambahkan parameter navigasi ke AI
+    onNavigateToMusic: () -> Unit,
+    onNavigateToAi: () -> Unit,
+    onNavigateToJournal: () -> Unit,
+    onNavigateToQuestionnaire: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
@@ -112,18 +114,18 @@ fun DashboardScreen(
         ) {
             // Menggunakan Icons.Default.List sebagai pengganti Assignment
             DashboardMenuItem(icon = Icons.Default.List, title = "Kuisioner Aktivitas") {
-                // TODO: Navigasi ke Kuesioner (Bisa ditambahkan parameter nanti kalau mau)
+                onNavigateToQuestionnaire()
             }
             HorizontalDivider(color = Color.White, thickness = 1.dp)
 
             // Menggunakan Icons.Default.Star sebagai pengganti Bedtime (karena berhubungan dengan malam)
             DashboardMenuItem(icon = Icons.Default.Star, title = "Pantauan Tidur") {
-                // TODO: Navigasi ke Pantauan Tidur
+                onNavigateToJournal()
             }
             HorizontalDivider(color = Color.White, thickness = 1.dp)
 
             // Menggunakan Icons.Default.Face sebagai pengganti SmartToy/Robot (mewakili AI)
-            DashboardMenuItem(icon = Icons.Default.Face, title = "Tanya NatunAI") {
+            DashboardMenuItem(icon = Icons.Default.Face, title = "Tanya CherryAI") {
                 onNavigateToAi() // <--- Panggil fungsi pindah ke AI di sini
             }
             HorizontalDivider(color = Color.White, thickness = 1.dp)
