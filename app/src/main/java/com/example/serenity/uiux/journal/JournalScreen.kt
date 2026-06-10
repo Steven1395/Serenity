@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.serenity.R
 
 @Composable
-fun JournalScreen() {
+fun JournalScreen(onNavigateBack: () -> Unit) {
     // Definisi Warna
     val BackgroundColor = Color(0xFF2E2559)
     val CardColor = Color(0xFF4C4378)
@@ -53,7 +53,7 @@ fun JournalScreen() {
             modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(
-                onClick = { /* TODO: Navigasi kembali */ },
+                onClick = onNavigateBack,
                 modifier = Modifier.size(24.dp)
             ) {
                 Icon(

@@ -23,7 +23,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Share
 
 @Composable
-fun MusicScreen() {
+fun MusicScreen(onNavigateBack: () -> Unit) {
     // 1. Definisi Warna yang konsisten dengan tema Serenity
     val BackgroundColor = Color(0xFF2E2559)
     val CardColor = Color(0xFF4C4378)
@@ -53,7 +53,7 @@ fun MusicScreen() {
             modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(
-                onClick = { /* TODO: Navigasi kembali */ },
+                onClick = onNavigateBack,
                 modifier = Modifier.size(24.dp)
             ) {
                 Icon(
@@ -79,7 +79,6 @@ fun MusicScreen() {
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            // TIPS: Untuk presentasi besok, jika belum ada gambar, biarkan kotak abu-abu ini.
             Box(
                 modifier = Modifier
                     .size(320.dp)
@@ -112,24 +111,21 @@ fun MusicScreen() {
                 )
             }
 
-            // Deretan Ikon Kanan (Like, Download, Share)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Icon Hati (Favorite)
                 IconButton(
                     onClick = { },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Filled.Favorite,
+                        imageVector = Icons.Filled.Favorite,
                         contentDescription = "Like",
                         tint = TextWhite
                     )
                 }
 
-                // Icon Download (Panah ke bawah tebal/fill)
                 IconButton(
                     onClick = { },
                     modifier = Modifier.size(32.dp)
@@ -141,13 +137,12 @@ fun MusicScreen() {
                     )
                 }
 
-                // Icon Share
                 IconButton(
                     onClick = { },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Filled.Share,
+                        imageVector = Icons.Filled.Share,
                         contentDescription = "Share",
                         tint = TextWhite
                     )
@@ -159,7 +154,7 @@ fun MusicScreen() {
 
         // --- PROGRESS BAR ---
         Slider(
-            value = 0.15f, // Angka statis untuk keperluan demo (15%)
+            value = 0.15f,
             onValueChange = { },
             colors = SliderDefaults.colors(
                 thumbColor = TextWhite,
@@ -184,10 +179,9 @@ fun MusicScreen() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("🔀", color = TextWhite, fontSize = 20.sp) // Shuffle
-            Text("⏮", color = TextWhite, fontSize = 24.sp) // Previous
+            Text("🔀", color = TextWhite, fontSize = 20.sp)
+            Text("⏮", color = TextWhite, fontSize = 24.sp)
 
-            // Tombol Play Besar
             Box(
                 modifier = Modifier
                     .size(64.dp)
@@ -195,17 +189,16 @@ fun MusicScreen() {
                     .background(TextGray),
                 contentAlignment = Alignment.Center
             ) {
-                Text("▶", color = BackgroundColor, fontSize = 24.sp) // Play
+                Text("▶", color = BackgroundColor, fontSize = 24.sp)
             }
 
-            Text("⏭", color = TextWhite, fontSize = 24.sp) // Next
-            Text("🔁", color = TextWhite, fontSize = 20.sp) // Repeat
+            Text("⏭", color = TextWhite, fontSize = 24.sp)
+            Text("🔁", color = TextWhite, fontSize = 20.sp)
         }
 
-        // Pendorong agar elemen "Up Next" selalu menempel di bagian bawah layar
         Spacer(modifier = Modifier.weight(1f))
 
-        // --- UP NEXT (Antrean Lagu) ---
+        // --- UP NEXT ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -217,7 +210,6 @@ fun MusicScreen() {
             Text(text = "Queue >", fontFamily = PoppinsFont, color = TextWhite, fontSize = 14.sp)
         }
 
-        // Kartu Lagu Selanjutnya
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -226,7 +218,6 @@ fun MusicScreen() {
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Placeholder Cover Mini
             Box(
                 modifier = Modifier
                     .size(48.dp)

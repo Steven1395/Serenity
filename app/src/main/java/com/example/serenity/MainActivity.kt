@@ -67,7 +67,9 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             "music" -> {
-                                MusicScreen()
+                                MusicScreen(
+                                    onNavigateBack = { currentScreen = "dashboard" }
+                                )
                             }
                             "ai" -> {
                                 AiScreen(
@@ -75,7 +77,9 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             "journal" -> {
-                                JournalScreen()
+                                JournalScreen(
+                                    onNavigateBack = { currentScreen = "dashboard" }
+                                )
                             }
                         }
 
