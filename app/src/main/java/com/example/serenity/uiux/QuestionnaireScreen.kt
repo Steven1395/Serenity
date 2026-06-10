@@ -13,10 +13,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel // <-- TAMBAHKAN IMPORT INI
 import com.example.serenity.R
+import com.example.serenity.viewmodel.JournalViewModel // <-- TAMBAHKAN IMPORT INI
 
 @Composable
-fun QuestionnaireScreen(onFinished: () -> Unit) { // <--- 1. TAMBAHKAN PARAMETER NAVIGASI DI SINI
+fun QuestionnaireScreen(
+    onFinished: () -> Unit,
+    viewModel: JournalViewModel = viewModel() // <--- HUBUNGKAN KE VIEWMODEL DI SINI
+) {
     // Definisi Warna Ungu dari Desain
     val DeepPurple = Color(0xFF422C73)
 
@@ -111,7 +116,15 @@ fun QuestionnaireScreen(onFinished: () -> Unit) { // <--- 1. TAMBAHKAN PARAMETER
                     currentQuestionIndex++
                 } else {
                     isFinished = true
-                    println("Semua jawaban disimpan: ${answers.toList()}")
+
+                    // --- PROSES PERHITUNGAN & PENYIMPANAN DATA RIIL ---
+                    val yesCount = answers.count { it == "Ya" }
+                    val totalQuestions = questions.size
+
+                    // Simpan ke database melalui fungsi baru di ViewModel
+                    viewModel.saveRealQuestionnaireResult(yesCount = yesCount, totalQuestions = totalQuestions)
+
+                    println("Semua jawaban disimpan ke Room DB: ${answers.toList()}")
                 }
             }
 
