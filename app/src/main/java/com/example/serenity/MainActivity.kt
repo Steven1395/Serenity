@@ -67,7 +67,9 @@ class MainActivity : ComponentActivity() {
                                 MusicScreen()
                             }
                             "ai" -> {
-                                AiScreen()
+                                AiScreen(
+                                    onNavigateBack = { currentScreen = "dashboard" }
+                                )
                             }
                         }
 

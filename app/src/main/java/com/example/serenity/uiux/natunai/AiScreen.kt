@@ -9,9 +9,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack // <-- Import Icon Back
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.example.serenity.R
 
 @Composable
-fun AiScreen() {
+fun AiScreen(onNavigateBack: () -> Unit) { // <-- Tambahkan parameter navigasi di sini
     // Definisi Warna Tema Serenity
     val BackgroundColor = Color(0xFF2E2559)
     val CardColor = Color(0xFF4C4378)
@@ -59,14 +59,15 @@ fun AiScreen() {
                 .statusBarsPadding() // Menghindari agar tidak tertabrak jam & baterai HP di atas
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            // Top Bar (Menu & Edit)
+            // Top Bar (Back & Edit)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { }) {
-                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu", tint = TextWhite)
+                // Tombol Back di kiri atas
+                IconButton(onClick = onNavigateBack) { // <-- Panggil fungsi kembali saat diklik
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back", tint = TextWhite)
                 }
                 IconButton(onClick = { }) {
                     Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit", tint = TextWhite)
@@ -77,7 +78,7 @@ fun AiScreen() {
 
             // Judul
             Text(
-                text = "Selamat datang\ndi NatunAI !",
+                text = "Selamat datang\ndi CherryAI !",
                 fontFamily = PoppinsFont,
                 fontWeight = FontWeight.Bold,
                 color = TextWhite,
