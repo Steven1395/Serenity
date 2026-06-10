@@ -9,19 +9,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.serenity.ui.theme.SerenityTheme
-import com.example.serenity.uiux.QuestionnaireScreen
-import com.example.serenity.uiux.journal.JournalScreen
+import com.example.serenity.ui.theme.NaptuneTheme
+import com.example.serenity.uiux.QuestionnaireScreen // Mengimpor layar yang udah kamu buat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SerenityTheme {
+            NaptuneTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        JournalScreen()
+                        QuestionnaireScreen()
                     }
                 }
             }
