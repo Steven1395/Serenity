@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.sp
 import com.example.serenity.R
 
 @Composable
-fun QuestionnaireScreen() {
-    // 1. Definisi Warna Ungu dari Desain
+fun QuestionnaireScreen(onFinished: () -> Unit) { // <--- 1. TAMBAHKAN PARAMETER NAVIGASI DI SINI
+    // Definisi Warna Ungu dari Desain
     val DeepPurple = Color(0xFF422C73)
 
-    // 2. Definisi Font Poppins
+    // Definisi Font Poppins
     val PoppinsFont = try {
         FontFamily(
             Font(R.font.poppins_regular, FontWeight.Normal),
@@ -177,6 +177,8 @@ fun QuestionnaireScreen() {
 
         } else {
             // TAMPILAN SELESAI
+            Spacer(modifier = Modifier.weight(1f))
+
             Text(
                 text = "Terima Kasih!",
                 fontFamily = PoppinsFont,
@@ -193,6 +195,27 @@ fun QuestionnaireScreen() {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // 2. SAKLAR KE DASHBOARD: Ditambahkan agar setelah membaca rangkuman, user bisa masuk ke Dashboard Utama
+            Button(
+                onClick = onFinished, // <--- Memanggil fungsi callback navigasi dari MainActivity
+                colors = ButtonDefaults.buttonColors(containerColor = DeepPurple),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(56.dp)
+            ) {
+                Text(
+                    text = "Masuk Ke Dashboard",
+                    fontFamily = PoppinsFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }

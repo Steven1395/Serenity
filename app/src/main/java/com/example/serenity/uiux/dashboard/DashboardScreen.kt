@@ -27,7 +27,10 @@ val ProfileLavender = Color(0xFF8884D8)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    onNavigateToMusic: () -> Unit, // <--- 1. Tambahkan parameter navigasi ke Musik
+    onNavigateToAi: () -> Unit     // <--- 2. Tambahkan parameter navigasi ke AI
+) {
     var searchQuery by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
@@ -100,7 +103,7 @@ fun DashboardScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-// --- DAFTAR MENU ---
+        // --- DAFTAR MENU ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -109,7 +112,7 @@ fun DashboardScreen() {
         ) {
             // Menggunakan Icons.Default.List sebagai pengganti Assignment
             DashboardMenuItem(icon = Icons.Default.List, title = "Kuisioner Aktivitas") {
-                // TODO: Navigasi ke Kuesioner
+                // TODO: Navigasi ke Kuesioner (Bisa ditambahkan parameter nanti kalau mau)
             }
             HorizontalDivider(color = Color.White, thickness = 1.dp)
 
@@ -121,13 +124,13 @@ fun DashboardScreen() {
 
             // Menggunakan Icons.Default.Face sebagai pengganti SmartToy/Robot (mewakili AI)
             DashboardMenuItem(icon = Icons.Default.Face, title = "Tanya NatunAI") {
-                // TODO: Navigasi ke NatunAI
+                onNavigateToAi() // <--- Panggil fungsi pindah ke AI di sini
             }
             HorizontalDivider(color = Color.White, thickness = 1.dp)
 
             // Menggunakan Icons.Default.PlayArrow sebagai pengganti MusicNote
             DashboardMenuItem(icon = Icons.Default.PlayArrow, title = "Musik Serenity") {
-                // TODO: Navigasi ke Musik
+                onNavigateToMusic() // <--- Panggil fungsi pindah ke Musik di sini
             }
             HorizontalDivider(color = Color.White, thickness = 1.dp)
 
