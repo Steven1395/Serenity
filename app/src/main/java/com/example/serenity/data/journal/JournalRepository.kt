@@ -1,4 +1,4 @@
-package com.example.serenity.data
+package com.example.serenity.data.journal
 
 import kotlinx.coroutines.flow.Flow
 

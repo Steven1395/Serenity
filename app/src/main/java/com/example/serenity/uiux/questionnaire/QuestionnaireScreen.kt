@@ -1,5 +1,6 @@
-package com.example.serenity.uiux
+package com.example.serenity.uiux.questionnaire
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -15,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel // <-- TAMBAHKAN IMPORT INI
 import com.example.serenity.R
-import com.example.serenity.viewmodel.JournalViewModel // <-- TAMBAHKAN IMPORT INI
+import com.example.serenity.viewmodel.journal.JournalViewModel // <-- TAMBAHKAN IMPORT INI
 
 @Composable
 fun QuestionnaireScreen(
@@ -51,6 +52,7 @@ fun QuestionnaireScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White) // paksa putih
             .padding(horizontal = 24.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -142,6 +144,7 @@ fun QuestionnaireScreen(
                     Text(
                         text = "Selanjutnya",
                         fontFamily = PoppinsFont,
+                        color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -180,6 +183,7 @@ fun QuestionnaireScreen(
                         Text(
                             text = if (currentQuestionIndex == questions.size - 1) "Selesai" else "Selanjutnya",
                             fontFamily = PoppinsFont,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -201,7 +205,7 @@ fun QuestionnaireScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
-                text = "Data kuesioner berhasil dianalisis oleh Natuna AI untuk mengoptimalkan tidurmu.\n\nHasil: ${answers.toList()}",
+                text = "Data kuesioner berhasil dianalisis oleh Cherry AI untuk mengoptimalkan tidurmu.\n\nHasil: ${answers.toList()}",
                 fontFamily = PoppinsFont,
                 color = DeepPurple,
                 fontSize = 16.sp,
@@ -223,6 +227,7 @@ fun QuestionnaireScreen(
                 Text(
                     text = "Masuk Ke Dashboard",
                     fontFamily = PoppinsFont,
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )

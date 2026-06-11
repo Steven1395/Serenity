@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.serenity.viewmodel.JournalViewModel
+import com.example.serenity.viewmodel.journal.JournalViewModel
 import kotlin.random.Random
 
 @Composable
