@@ -3,116 +3,157 @@ package com.example.serenity.uiux.journal
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.serenity.R
 import com.example.serenity.viewmodel.journal.JournalViewModel
-import kotlin.random.Random
 
 @Composable
 fun JournalScreen(
-    viewModel: JournalViewModel = viewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit = {},
+    viewModel: JournalViewModel = viewModel()
 ) {
-    // Ambil data skor kuesioner dari Room secara realtime
-    val databaseScores by viewModel.chartScoresProvider.collectAsState()
+    // Skema Warna Premium
+    val BackgroundColor = Color(0xFF1D1737)
+    val CardBackgroundColor = Color(0xFF332A55)
+    val BarColor = Color(0xFF9279F8)
+    val TextMuted = Color(0xFFB3AEC6)
 
-    val BackgroundColor = Color(0xFF2E2559)
-    val CardColor = Color(0xFF4C4378)
-    val TextWhite = Color(0xFFFFFFFF)
-    val BarColor = Color(0xFF8B78E6)
-    val TextGray = Color(0xFFB3ADCC)
+    // Definisi Font Poppins
+    val PoppinsFont = try {
+        FontFamily(
+            Font(R.font.poppins_regular, FontWeight.Normal),
+            Font(R.font.poppins_bold, FontWeight.Bold)
+        )
+    } catch (e: Exception) {
+        FontFamily.Default
+    }
+
+    // Mengambil data riil dari Room DB secara realtime
+    val chartData by viewModel.chartScoresProvider.collectAsState()
+
+    // 1. MEMBUAT LIST HARI FIX (Senin - Minggu)
+    val daysOfWeek = listOf("Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundColor)
-            .padding(24.dp)
-            .statusBarsPadding()
+            .padding(horizontal = 24.dp, vertical = 24.dp)
     ) {
-        Text(text = "Statistik Ketenangan", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextWhite)
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // JUDUL UTAMA STATISTIK
+        Text(
+            text = "Statistik Ketenangan",
+            fontFamily = PoppinsFont,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Laporan hasil kuesionermu selama 7 hari terakhir.", fontSize = 14.sp, color = TextGray)
 
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // --- KARTU DIAGRAM BATANG ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(CardColor)
-                .padding(top = 24.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
-        ) {
-            if (databaseScores.isEmpty()) {
-                // Keadaan jika database masih kosong melompong
-                Text(
-                    text = "Belum ada data kuesioner.\nSilakan klik tombol simulasi di bawah.",
-                    color = TextGray,
-                    fontSize = 14.sp,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    databaseScores.forEach { data ->
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Bottom,
-                            modifier = Modifier.fillMaxHeight()
-                        ) {
-                            Text(
-                                text = "${(data.score * 100).toInt()}%",
-                                color = TextWhite,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 6.dp)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .width(28.dp)
-                                    .fillMaxHeight(data.score) // Menggunakan nilai float database asli (0.0f - 1.0f)
-                                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                                    .background(BarColor)
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(text = data.dayName, color = TextGray, fontSize = 12.sp)
-                        }
-                    }
-                }
-            }
-        }
+        // SUB-JUDUL
+        Text(
+            text = "Laporan hasil kuesionermu selama 7 hari terakhir.",
+            fontFamily = PoppinsFont,
+            fontSize = 14.sp,
+            color = TextMuted
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- TOMBOL SIMULASI KUESIONER (UNTUK KEPERLUAN DEMO PRESENTASI) ---
-        Text(text = "Simulasi Pengisian Kuesioner", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextWhite)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val daysOptions = listOf("Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min")
-
-        Button(
-            onClick = {
-                // Saat diklik, generate hari acak dan skor kuesioner acak (30% - 100%) lalu simpan ke Room
-                val randomDay = daysOptions[Random.nextInt(daysOptions.size)]
-                val randomScore = Random.nextInt(30, 100) / 100f
-                viewModel.addMockScore(randomDay, randomScore)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5E5686))
+        // KARTU UTAMA WADAH GRAFIK
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            colors = CardDefaults.cardColors(containerColor = CardBackgroundColor),
+            shape = RoundedCornerShape(18.dp)
         ) {
-            Text("Isi Kuesioner Acak & Simpan ke Room", color = TextWhite)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 28.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Looping berdasarkan urutan hari yang sudah FIX Senin - Minggu
+                daysOfWeek.forEach { day ->
+
+                    // Mencari data kuesioner terakhir yang cocok dengan nama hari ini
+                    val matchedEntity = chartData.lastOrNull {
+                        it.dayName.equals(day, ignoreCase = true)
+                    }
+
+                    // Konversi skor desimal (0.0f - 1.0f) ke bentuk persen (0 - 100)
+                    val scorePercentage = if (matchedEntity != null) {
+                        (matchedEntity.score * 100).toInt().coerceIn(0, 100)
+                    } else {
+                        0
+                    }
+
+                    // Struktur Kolom Tunggal untuk Satu Batang Grafik
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        // Teks Persentase di atas Batang
+                        Text(
+                            text = "$scorePercentage%",
+                            fontFamily = PoppinsFont,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        // Area Batang Grafik Dinamis
+                        Box(
+                            modifier = Modifier
+                                .height(180.dp)
+                                .width(22.dp),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            // Batang Ungu yang tingginya mengikuti scorePercentage
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(if (scorePercentage > 0) scorePercentage / 100f else 0.02f)
+                                    .background(
+                                        color = if (scorePercentage > 0) BarColor else BarColor.copy(alpha = 0.1f),
+                                        shape = RoundedCornerShape(6.dp)
+                                    )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Label Nama Hari yang sudah fix di bawahnya
+                        Text(
+                            text = day,
+                            fontFamily = PoppinsFont,
+                            fontSize = 12.sp,
+                            color = TextMuted,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+                }
+            }
         }
     }
 }
