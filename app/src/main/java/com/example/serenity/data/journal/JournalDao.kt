@@ -19,4 +19,8 @@ interface JournalDao {
 
     @Query("DELETE FROM table_journal WHERE id = :journalId")
     suspend fun deleteJournalById(journalId: Int): Int
+
+    // --- TAMBAHAN BARU: Menghapus data berdasarkan nama hari ---
+    @Query("DELETE FROM table_journal WHERE dayName = :targetDay")
+    suspend fun deleteDataByDay(targetDay: String)
 }

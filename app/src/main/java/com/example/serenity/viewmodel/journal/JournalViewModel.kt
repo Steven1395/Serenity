@@ -41,21 +41,35 @@ class JournalViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // --- TAMBAHAN: FUNGSI UNTUK MENYIMPAN HASIL KUESIONER RIIL ---
-    fun saveRealQuestionnaireResult(yesCount: Int, totalQuestions: Int) {
+    // --- PERBARUAN: Menghapus data hari ini sebelum menyimpan yang baru ---
+    fun saveRealQuestionnaireResult(answers: List<String>) {
         viewModelScope.launch {
-            // 1. Hitung persentase desimal (Contoh: 2 "Ya" dari 4 soal = 0.5f atau 50% di grafik)
-            val calculatedScore = if (totalQuestions > 0) yesCount.toFloat() / totalQuestions.toFloat() else 0.0f
+            var positiveCount = 0f
 
-            // 2. Ambil nama hari pendek otomatis dalam Bahasa Indonesia (Sen, Sel, Rab, Kam, Jum, Sab, Min)
+            // Pertanyaan 1: Makan berat/alkohol (Jawaban sehat: "Tidak")
+            if (answers.getOrNull(0) == "Tidak") positiveCount += 1f
+            // Pertanyaan 2: Konsumsi kafein (Jawaban sehat: "Tidak")
+            if (answers.getOrNull(1) == "Tidak") positiveCount += 1f
+            // Pertanyaan 3: Cemas/Overthinking (Jawaban sehat: "Tidak")
+            if (answers.getOrNull(2) == "Tidak") positiveCount += 1f
+            // Pertanyaan 4: Bangun merasa segar (Jawaban sehat: "Ya")
+            if (answers.getOrNull(3) == "Ya") positiveCount += 1f
+
+            // Hitung persentase desimal dari 4 pertanyaan
+            val calculatedScore = positiveCount / 4f
+
+            // Ambil nama hari pendek otomatis
             val dayFormat = SimpleDateFormat("EEE", Locale("id", "ID"))
-            val currentDay = dayFormat.format(Date()).replace(".", "") // Jaga-jaga jika OS Android memberi titik (cth: "Sab.")
+            val currentDay = dayFormat.format(Date()).replace(".", "")
 
-            // 3. Ambil tanggal hari ini sebagai penanda waktu unik
+            // Ambil tanggal hari ini
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val timestamp = dateFormat.format(Date())
 
-            // 4. Masukkan ke database Room
+            // 1. Hapus data kuesioner di hari yang sama agar tidak menumpuk
+            repository.deleteDataByDay(currentDay)
+
+            // 2. Masukkan data baru ke database Room
             repository.insert(
                 JournalEntity(
                     dayName = currentDay,

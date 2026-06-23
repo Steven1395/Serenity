@@ -14,19 +14,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel // <-- TAMBAHKAN IMPORT INI
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.serenity.R
-import com.example.serenity.viewmodel.journal.JournalViewModel // <-- TAMBAHKAN IMPORT INI
+import com.example.serenity.viewmodel.journal.JournalViewModel
+import com.example.serenity.viewmodel.SleepViewModel
+import java.util.Calendar
 
 @Composable
 fun QuestionnaireScreen(
     onFinished: () -> Unit,
-    viewModel: JournalViewModel = viewModel() // <--- HUBUNGKAN KE VIEWMODEL DI SINI
+    viewModel: JournalViewModel = viewModel(),
+    sleepViewModel: SleepViewModel = viewModel()
 ) {
-    // Definisi Warna Ungu dari Desain
     val DeepPurple = Color(0xFF422C73)
+    val LightPurple = Color(0xFF9279F8)
+    val PinkHighlight = Color(0xFFE91E63)
 
-    // Definisi Font Poppins
     val PoppinsFont = try {
         FontFamily(
             Font(R.font.poppins_regular, FontWeight.Normal),
@@ -38,10 +41,10 @@ fun QuestionnaireScreen(
 
     val questions = remember {
         listOf(
-            "Apakah kamu sering menggunakan smartphone?\n(lebih dari 4 jam per hari)",
-            "Apakah kamu mengonsumsi kafein atau kopi dalam 6 jam sebelum tidur?",
-            "Apakah jadwal tidurmu teratur dalam 3 hari terakhir?",
-            "Apakah kamu merasa segar saat bangun tidur pagi ini?"
+            "Apakah kamu makan berat atau mengonsumsi alkohol dalam 3 jam sebelum tidur?",
+            "Apakah kamu mengonsumsi kafein (kopi, teh, atau soda) dalam 6 jam sebelum tidur?",
+            "Apakah kamu sempat merasa cemas, stres, atau overthinking semalam sebelum memejamkan mata?",
+            "Apakah kamu merasa segar dan berenergi saat bangun tidur pagi ini?"
         )
     }
 
@@ -49,17 +52,19 @@ fun QuestionnaireScreen(
     var currentQuestionIndex by remember { mutableIntStateOf(0) }
     var isFinished by remember { mutableStateOf(false) }
 
+    var sleepHours by remember { mutableFloatStateOf(7f) }
+    var screenTimeHours by remember { mutableFloatStateOf(2f) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White) // paksa putih
+            .background(Color.White)
             .padding(horizontal = 24.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (!isFinished) {
-            // JUDUL
             Text(
-                text = "Kuisioner Harian",
+                text = "Kuesioner Harian",
                 fontFamily = PoppinsFont,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -67,10 +72,8 @@ fun QuestionnaireScreen(
                 modifier = Modifier.padding(top = 24.dp)
             )
 
-            // Pendorong elastis agar pertanyaan pas di tengah
             Spacer(modifier = Modifier.weight(1f))
 
-            // TEKS PERTANYAAN
             Text(
                 text = questions[currentQuestionIndex],
                 fontFamily = PoppinsFont,
@@ -80,7 +83,6 @@ fun QuestionnaireScreen(
                 modifier = Modifier.padding(bottom = 40.dp)
             )
 
-            // PILIHAN JAWABAN (RADIO BUTTON)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -89,10 +91,7 @@ fun QuestionnaireScreen(
                     RadioButton(
                         selected = (answers[currentQuestionIndex] == "Ya"),
                         onClick = { answers[currentQuestionIndex] = "Ya" },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = DeepPurple,
-                            unselectedColor = DeepPurple
-                        )
+                        colors = RadioButtonDefaults.colors(selectedColor = DeepPurple, unselectedColor = DeepPurple)
                     )
                     Text(text = "Ya", fontFamily = PoppinsFont, color = DeepPurple)
                 }
@@ -101,16 +100,12 @@ fun QuestionnaireScreen(
                     RadioButton(
                         selected = (answers[currentQuestionIndex] == "Tidak"),
                         onClick = { answers[currentQuestionIndex] = "Tidak" },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = DeepPurple,
-                            unselectedColor = DeepPurple
-                        )
+                        colors = RadioButtonDefaults.colors(selectedColor = DeepPurple, unselectedColor = DeepPurple)
                     )
                     Text(text = "Tidak", fontFamily = PoppinsFont, color = DeepPurple)
                 }
             }
 
-            // Pendorong elastis agar tombol turun ke bawah
             Spacer(modifier = Modifier.weight(1.2f))
 
             val onNextClick: () -> Unit = {
@@ -118,36 +113,18 @@ fun QuestionnaireScreen(
                     currentQuestionIndex++
                 } else {
                     isFinished = true
-
-                    // --- PROSES PERHITUNGAN & PENYIMPANAN DATA RIIL ---
-                    val yesCount = answers.count { it == "Ya" }
-                    val totalQuestions = questions.size
-
-                    // Simpan ke database melalui fungsi baru di ViewModel
-                    viewModel.saveRealQuestionnaireResult(yesCount = yesCount, totalQuestions = totalQuestions)
-
-                    println("Semua jawaban disimpan ke Room DB: ${answers.toList()}")
                 }
             }
 
-            // TOMBOL NAVIGASI
             if (currentQuestionIndex == 0) {
                 Button(
                     onClick = onNextClick,
                     enabled = answers[currentQuestionIndex].isNotEmpty(),
                     colors = ButtonDefaults.buttonColors(containerColor = DeepPurple),
                     shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth(0.6f)
-                        .height(56.dp)
+                    modifier = Modifier.fillMaxWidth(0.6f).height(56.dp)
                 ) {
-                    Text(
-                        text = "Selanjutnya",
-                        fontFamily = PoppinsFont,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+                    Text(text = "Selanjutnya", fontFamily = PoppinsFont, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             } else {
                 Row(
@@ -157,17 +134,9 @@ fun QuestionnaireScreen(
                     OutlinedButton(
                         onClick = { currentQuestionIndex-- },
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp)
-                            .padding(end = 8.dp)
+                        modifier = Modifier.weight(1f).height(56.dp).padding(end = 8.dp)
                     ) {
-                        Text(
-                            text = "Kembali",
-                            fontFamily = PoppinsFont,
-                            color = DeepPurple,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = "Kembali", fontFamily = PoppinsFont, color = DeepPurple, fontWeight = FontWeight.Bold)
                     }
 
                     Button(
@@ -175,10 +144,7 @@ fun QuestionnaireScreen(
                         enabled = answers[currentQuestionIndex].isNotEmpty(),
                         colors = ButtonDefaults.buttonColors(containerColor = DeepPurple),
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp)
-                            .padding(start = 8.dp)
+                        modifier = Modifier.weight(1f).height(56.dp).padding(start = 8.dp)
                     ) {
                         Text(
                             text = if (currentQuestionIndex == questions.size - 1) "Selesai" else "Selanjutnya",
@@ -193,44 +159,87 @@ fun QuestionnaireScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
         } else {
-            // TAMPILAN SELESAI
-            Spacer(modifier = Modifier.weight(1f))
-
             Text(
-                text = "Terima Kasih!",
+                text = "Satu Langkah Lagi!",
                 fontFamily = PoppinsFont,
                 color = DeepPurple,
-                fontSize = 28.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             )
+
             Text(
-                text = "Data kuesioner berhasil dianalisis oleh Cherry AI untuk mengoptimalkan tidurmu.\n\nHasil: ${answers.toList()}",
+                text = "Lengkapi data tidurmu agar Cherry AI bisa bekerja lebih optimal.",
                 fontFamily = PoppinsFont,
-                color = DeepPurple,
-                fontSize = 16.sp,
+                color = DeepPurple.copy(alpha = 0.7f),
+                fontSize = 14.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp)
             )
+
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                Text(text = "Berapa jam kamu tidur semalam?", fontFamily = PoppinsFont, color = DeepPurple, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = String.format("%.1f Jam", sleepHours), fontFamily = PoppinsFont, color = LightPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Slider(
+                    value = sleepHours,
+                    onValueChange = { sleepHours = it },
+                    valueRange = 0f..12f,
+                    steps = 11,
+                    colors = SliderDefaults.colors(thumbColor = LightPurple, activeTrackColor = LightPurple, inactiveTrackColor = LightPurple.copy(alpha = 0.3f))
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                Text(text = "Berapa jam main HP sebelum tidur?", fontFamily = PoppinsFont, color = DeepPurple, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = String.format("%.1f Jam", screenTimeHours), fontFamily = PoppinsFont, color = PinkHighlight, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Slider(
+                    value = screenTimeHours,
+                    onValueChange = { screenTimeHours = it },
+                    valueRange = 0f..8f,
+                    steps = 7,
+                    colors = SliderDefaults.colors(thumbColor = PinkHighlight, activeTrackColor = PinkHighlight, inactiveTrackColor = PinkHighlight.copy(alpha = 0.3f))
+                )
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // 2. SAKLAR KE DASHBOARD: Ditambahkan agar setelah membaca rangkuman, user bisa masuk ke Dashboard Utama
             Button(
-                onClick = onFinished, // <--- Memanggil fungsi callback navigasi dari MainActivity
+                onClick = {
+                    // A. Simpan data kuesioner psikologis dengan logika baru
+                    viewModel.saveRealQuestionnaireResult(answers.toList())
+
+                    // B. LOGIKA MENGHITUNG KUALITAS TIDUR BERDASARKAN SAINS MEDIS
+                    val finalQualityResult = if (sleepHours in 7f..9f && screenTimeHours <= 4f) {
+                        "Bagus" // Tidur ideal dan screen time wajar
+                    } else if (sleepHours < 6f || screenTimeHours >= 8f) {
+                        "Buruk" // Kurang tidur kronis ATAU screen time sangat parah
+                    } else {
+                        "Buruk" // Sisanya (misal tidur 6.5 jam tapi screen time 7 jam) dikategorikan kurang sehat (Pink di UI)
+                    }
+
+                    // C. Dapatkan singkatan hari dinamis
+                    val calendar = Calendar.getInstance()
+                    val daysArray = arrayOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab")
+                    val todayName = daysArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]
+
+                    // D. Simpan data tidur
+                    sleepViewModel.saveSleepData(
+                        dayName = todayName,
+                        sleepHours = sleepHours,
+                        screenTimeHours = screenTimeHours,
+                        sleepQuality = finalQualityResult
+                    )
+
+                    // E. Navigasi Selesai ke Dashboard
+                    onFinished()
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = DeepPurple),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(56.dp)
+                modifier = Modifier.fillMaxWidth(0.9f).height(56.dp)
             ) {
-                Text(
-                    text = "Masuk Ke Dashboard",
-                    fontFamily = PoppinsFont,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+                Text(text = "Simpan & Masuk Dashboard", fontFamily = PoppinsFont, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(24.dp))

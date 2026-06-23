@@ -8,4 +8,9 @@ class JournalRepository(private val journalDao: JournalDao) {
     suspend fun insert(journal: JournalEntity): Long {
         return journalDao.insertJournal(journal)
     }
+
+    // --- TAMBAHAN BARU: Jembatan untuk memanggil fungsi hapus dari DAO ---
+    suspend fun deleteDataByDay(dayName: String) {
+        journalDao.deleteDataByDay(dayName)
+    }
 }
