@@ -42,7 +42,7 @@ fun QuestionnaireScreen(
     val questions = remember {
         listOf(
             "Apakah kamu makan berat atau mengonsumsi alkohol dalam 3 jam sebelum tidur?",
-            "Apakah kamu mengonsumsi kafein (kopi, teh, atau soda) dalam 6 jam sebelum tidur?",
+            "Apakah kamu mengonsumsi kafein dalam 6 jam sebelum tidur?",
             "Apakah kamu sempat merasa cemas, stres, atau overthinking semalam sebelum memejamkan mata?",
             "Apakah kamu merasa segar dan berenergi saat bangun tidur pagi ini?"
         )
