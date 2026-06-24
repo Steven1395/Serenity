@@ -16,19 +16,28 @@ class MusicService : MediaSessionService() {
     override fun onCreate() {
         super.onCreate()
 
-        // 1. Buat mesin ExoPlayer baru di dalam Service
         val player = ExoPlayer.Builder(this).build()
 
-        // 2. Bungkus mesin tersebut ke dalam MediaSession
         mediaSession = MediaSession.Builder(this, player).build()
     }
 
-    // Fungsi wajib agar UI (ViewModel) bisa terhubung dan mengontrol Service ini
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
         return mediaSession
     }
 
-    // Membersihkan memori saat Service benar-benar dimatikan
+    // --- TAMBAHAN BARU DI SINI ---
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        val player = mediaSession?.player
+
+        if (player != null) {
+            player.stop()
+        }
+
+        stopSelf()
+
+        super.onTaskRemoved(rootIntent)
+    }
+
     override fun onDestroy() {
         mediaSession?.player?.release()
         mediaSession?.release()

@@ -21,11 +21,16 @@ import kotlinx.coroutines.launch
 
 class MusicViewModel(application: Application) : AndroidViewModel(application), Player.Listener {
 
+
+
     private val _uiState = MutableStateFlow(MusicUiState())
     val uiState: StateFlow<MusicUiState> = _uiState.asStateFlow()
 
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var player: Player? = null
+
+    // Inisialisasi service penembak API
+    private val apiService = com.example.serenity.data.api.ApiService.create()
 
     init {
         initializeController()
@@ -55,25 +60,40 @@ class MusicViewModel(application: Application) : AndroidViewModel(application), 
         )
     }
 
+    // Hanya gunakan SATU fungsi loadSamplePlaylist (Versi API Internet)
     private fun loadSamplePlaylist() {
-        val sampleTracks = listOf(
-            AudioTrack("1", "Go Sleep", "The Sleeping Lofi", "https://storage.googleapis.com/exoplayer-test-media-0/play.mp3"),
-            AudioTrack("2", "Young", "The Chainsmokers", "https://storage.googleapis.com/exoplayer-test-media-0/big_buck_bunny.mp3")
-        )
+        viewModelScope.launch {
+            try {
+                // 1. Tembak API untuk mengambil daftar lagu dari internet
+                val remoteTracks = apiService.getPlaylist()
 
-        _uiState.update {
-            it.copy(playlist = sampleTracks, currentTrack = sampleTracks.firstOrNull())
-        }
+                // 2. Update UI State dengan data lagu dari internet
+                _uiState.update {
+                    it.copy(playlist = remoteTracks, currentTrack = remoteTracks.firstOrNull())
+                }
 
-        player?.let { p ->
-            p.clearMediaItems()
-            sampleTracks.forEach { track ->
-                p.addMediaItem(MediaItem.fromUri(track.audioUrl))
+                // 3. Masukkan lagu ke dalam ExoPlayer
+                player?.let { p ->
+                    p.clearMediaItems()
+                    remoteTracks.forEach { track ->
+                        p.addMediaItem(MediaItem.fromUri(track.audioUrl))
+                    }
+                    p.prepare()
+                }
+            } catch (e: Exception) {
+                // Jika internet putus atau URL 404, dia akan lari ke sini tanpa membuat aplikasi force close
+                e.printStackTrace()
             }
-            p.prepare()
         }
     }
 
+    fun playSongByEmotion(selectedEmotion: String) {
+        val trackIndex = _uiState.value.playlist.indexOfFirst { it.emotion == selectedEmotion }
+
+        if (trackIndex != -1) {
+            playTrackAt(trackIndex)
+        }
+    }
     fun togglePlayPause() {
         player?.let { p ->
             if (p.isPlaying) p.pause() else p.play()
@@ -94,6 +114,13 @@ class MusicViewModel(application: Application) : AndroidViewModel(application), 
 
     fun seekToPosition(position: Long) {
         player?.seekTo(position)
+    }
+
+    fun playTrackAt(index: Int) {
+        player?.let { p ->
+            p.seekToDefaultPosition(index) // Lompat ke lagu yang dipilih
+            p.play() // Pastikan lagunya langsung berputar
+        }
     }
 
     private fun monitorPlaybackProgress() {

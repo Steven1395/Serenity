@@ -11,5 +11,7 @@ data class AudioTrack(
     val id: String,
     val title: String,
     val artist: String,
-    val audioUrl: String
+    val emotion: String,
+    val audioUrl: String,
+    val coverUrl: String
 )
