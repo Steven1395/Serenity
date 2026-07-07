@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.android)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -89,4 +90,8 @@ dependencies {
 
     // 6. Library resmi untuk Google Gemini AI
     implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
+
+    // 7. Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-auth")
 }
