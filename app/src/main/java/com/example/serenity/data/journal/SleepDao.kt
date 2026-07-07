@@ -10,12 +10,15 @@ interface SleepDao {
     @Insert
     suspend fun insertSleepData(sleepEntity: SleepEntity)
 
-    // Mengambil 7 data terakhir untuk ditampilkan di grafik nanti
+    // Mengambil 7 data terakhir untuk grafik mingguan
     @Query("SELECT * FROM sleep_journal ORDER BY timestamp DESC LIMIT 7")
     fun getRecentSleepData(): Flow<List<SleepEntity>>
 
-    // --- TAMBAHAN BARU ---
-    // Menghapus data lama di hari yang sama agar tidak terjadi penumpukan/duplikasi grafik
+    // Menghapus data lama di hari yang sama agar tidak duplikat
     @Query("DELETE FROM sleep_journal WHERE dayName = :targetDay")
     suspend fun deleteDataByDay(targetDay: String)
+
+    // Mengambil 1 data tidur paling baru untuk dianalisis oleh CherryAI
+    @Query("SELECT * FROM sleep_journal ORDER BY timestamp DESC LIMIT 1")
+    fun getLatestSleep(): Flow<SleepEntity?>
 }

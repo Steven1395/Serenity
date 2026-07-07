@@ -9,5 +9,6 @@ data class JournalEntity(
     val id: Int = 0,
     val dayName: String, // Contoh: "Sen", "Sel", "Rab"
     val score: Float,    // Nilai rentang 0.0f sampai 1.0f (untuk persentase tinggi batang)
-    val date: String     // Tanggal lengkap untuk pencatatan sistem
+    val date: String,     // Tanggal lengkap untuk pencatatan sistem
+    val notes: String = ""
 )
