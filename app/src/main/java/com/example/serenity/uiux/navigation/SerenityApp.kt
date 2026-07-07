@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.serenity.uiux.auth.LandingScreen
 import com.example.serenity.uiux.auth.LogInScreen
 import com.example.serenity.uiux.auth.SignInScreen
+import com.example.serenity.uiux.auth.ForgotPasswordScreen
 import com.example.serenity.uiux.dashboard.DashboardScreen
 import com.example.serenity.uiux.questionnaire.QuestionnaireScreen
 import com.example.serenity.uiux.journal.JournalScreen
@@ -29,16 +30,31 @@ fun SerenityApp() {
             LogInScreen(
                 onLoginSuccess = {
                     navController.navigate(Screen.Questionnaire.route) {
-                        // popUpTo ini menghapus history Login biar user gabisa back ke Login lagi
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
-                onNavigateToSignIn = { navController.navigate(Screen.SignIn.route) }
+                onNavigateToSignIn = { navController.navigate(Screen.SignIn.route) },
+                onNavigateToForgotPass = { navController.navigate(Screen.ForgotPassword.route) }
             )
         }
 
+        // --- 1. PERBAIKAN ALUR SIGN IN ---
         composable(Screen.SignIn.route) {
-            SignInScreen(onContinueClick = { navController.navigate(Screen.Questionnaire.route) })
+            SignInScreen(
+                onContinueClick = {
+                    navController.navigate(Screen.Login.route) {
+                        // Menghapus riwayat Sign In agar ketika di halaman Login user menekan back, aplikasi langsung keluar
+                        popUpTo(Screen.SignIn.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // --- 2. PERBAIKAN FORGOT PASSWORD (TANPA PARAMETER) ---
+        composable(Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(onNavigateBackToLogin = {
+                navController.popBackStack()
+            })
         }
 
         composable(Screen.Questionnaire.route) {
