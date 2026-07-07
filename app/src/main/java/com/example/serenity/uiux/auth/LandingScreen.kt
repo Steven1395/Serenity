@@ -61,7 +61,7 @@ fun LandingScreen(onGetStartedClick: () -> Unit) {
                 modifier = Modifier.width(250.dp).height(64.dp)
             ) {
                 Text(
-                    text = "Get Started!",
+                    text = "Mulai",
                     fontFamily = PoppinsFont,
                     color = Color(0xFF1D1B20),
                     fontSize = 20.sp,
