@@ -23,4 +23,8 @@ interface JournalDao {
     // --- TAMBAHAN BARU: Menghapus data berdasarkan nama hari ---
     @Query("DELETE FROM table_journal WHERE dayName = :targetDay")
     suspend fun deleteDataByDay(targetDay: String)
+
+    // Mengambil 1 data kuesioner paling baru untuk dibaca AI
+    @Query("SELECT * FROM table_journal ORDER BY id DESC LIMIT 1")
+    fun getLatestJournal(): kotlinx.coroutines.flow.Flow<JournalEntity?>
 }

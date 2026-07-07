@@ -8,13 +8,22 @@ import com.example.serenity.data.journal.JournalDao
 import com.example.serenity.data.journal.JournalEntity
 import com.example.serenity.data.journal.SleepDao
 import com.example.serenity.data.journal.SleepEntity
+// 1. Import tabel dan perintah untuk fitur Chat
+import com.example.serenity.data.natunai.ChatDao
+import com.example.serenity.data.natunai.ChatEntity
 
-// PERBARUAN: Ubah version menjadi 3 karena ada kolom 'sleepQuality' baru di SleepEntity
-@Database(entities = [JournalEntity::class, SleepEntity::class], version = 3, exportSchema = false)
+// 2. PERBARUAN: Tambahkan ChatEntity::class dan ubah version menjadi 4
+@Database(
+    entities = [JournalEntity::class, SleepEntity::class, ChatEntity::class],
+    version = 4,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun journalDao(): JournalDao
     abstract fun sleepDao(): SleepDao
+    // 3. Tambahkan fungsi abstract untuk ChatDao di sini
+    abstract fun chatDao(): ChatDao
 
     companion object {
         @Volatile
@@ -27,7 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "serenity_database"
                 )
-                    // Tetap pertahankan ini agar database otomatis meriset tabel lama tanpa bikin aplikasi crash
+                    // Tetap pertahankan ini agar database otomatis mereset tabel lama tanpa bikin aplikasi crash
                     .fallbackToDestructiveMigration()
                     .build()
 

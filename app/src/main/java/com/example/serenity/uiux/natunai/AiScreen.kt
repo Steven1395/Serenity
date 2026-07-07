@@ -3,40 +3,63 @@ package com.example.serenity.uiux.natunai
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack // <-- Import Icon Back
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.serenity.R
+import com.example.serenity.data.natunai.ChatEntity
+import com.example.serenity.viewmodel.natunai.AiViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AiScreen(onNavigateBack: () -> Unit) { // <-- Tambahkan parameter navigasi di sini
-    // Definisi Warna Tema Serenity
-    val BackgroundColor = Color(0xFF2E2559)
-    val CardColor = Color(0xFF4C4378)
-    val TextWhite = Color(0xFFFFFFFF)
-    val TextGray = Color(0xFFD0CCDF)
+fun AiScreen(
+    onNavigateBack: () -> Unit, // <-- Tetap dipertahankan agar tidak terjadi error kompilasi pada NavHost
+    viewModel: AiViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    val inputText by viewModel.inputText.collectAsState()
+    val chatHistory by viewModel.chatHistory.collectAsState()
 
-    // Definisi Font Poppins
+    // Ambil data sesi dari ViewModel
+    val allSessions by viewModel.allSessions.collectAsState()
+    val currentSessionId by viewModel.currentSessionId.collectAsState()
+
+    // Pengendali buka/tutup laci samping
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    val BackgroundColor = Color(0xFF231B45)
+    val CardColor = Color(0xFF3F356B)
+    val UserBubbleColor = Color(0xFFD8578A)
+    val TextWhite = Color(0xFFFFFFFF)
+    val TextGray = Color(0xFFBDB7D0)
+
     val PoppinsFont = try {
         FontFamily(
             Font(R.font.poppins_regular, FontWeight.Normal),
@@ -46,181 +69,286 @@ fun AiScreen(onNavigateBack: () -> Unit) { // <-- Tambahkan parameter navigasi d
         FontFamily.Default
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundColor)
-    ) {
-        // --- KONTEN UTAMA (Bisa di-scroll jika panjang) ---
-        Column(
-            modifier = Modifier
-                .weight(1f) // Mengisi sisa ruang kosong
-                .verticalScroll(rememberScrollState())
-                .statusBarsPadding() // Menghindari agar tidak tertabrak jam & baterai HP di atas
-                .padding(horizontal = 24.dp, vertical = 24.dp)
-        ) {
-            // Top Bar (Back & Edit)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+    // IMPLEMENTASI HAMBURGER MENU DRAWER
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = BackgroundColor,
+                modifier = Modifier.width(280.dp)
             ) {
-                // Tombol Back di kiri atas
-                IconButton(onClick = onNavigateBack) { // <-- Panggil fungsi kembali saat diklik
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back", tint = TextWhite)
-                }
-                IconButton(onClick = { }) {
-                    Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit", tint = TextWhite)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Judul
-            Text(
-                text = "Selamat datang\ndi CherryAI !",
-                fontFamily = PoppinsFont,
-                fontWeight = FontWeight.Bold,
-                color = TextWhite,
-                fontSize = 24.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Rekomendasi
-            Text(
-                text = "Berikut rekomendasi harian, untukmu :",
-                fontFamily = PoppinsFont,
-                fontWeight = FontWeight.Bold,
-                color = TextWhite,
-                fontSize = 14.sp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Tidurmu semalam baru dimulai pukul 01.30. Tidur lebih awal bisa bantu tubuhmu memperbaiki diri lebih optimal. Coba targetkan jam 22.30 malam ini, ya. Selain itu, Aku juga mendeteksi nada suara yang menunjukkan stres. Gimana kalau kamu dengarkan musik relaksasi atau coba teknik napas 4-7-8 malam ini?",
-                fontFamily = PoppinsFont,
-                color = TextGray,
-                fontSize = 14.sp,
-                lineHeight = 22.sp
-            )
-
-            Spacer(modifier = Modifier.height(48.dp))
-
-            // Tanya Apa Saja
-            Text(
-                text = "Tanya apa saja!",
-                fontFamily = PoppinsFont,
-                fontWeight = FontWeight.Bold,
-                color = TextWhite,
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Baris Tombol Aksi (Analisis & Tips)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                // Tombol Analisis Gambar
-                OutlinedButton(
-                    onClick = { },
-                    shape = CircleShape,
-                    border = BorderStroke(1.dp, TextGray),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent)
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(24.dp)
                 ) {
-                    Icon(Icons.Filled.Search, contentDescription = null, tint = Color(0xFFE91E63), modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Analisis Gambar", fontFamily = PoppinsFont, color = TextWhite, fontSize = 12.sp)
-                }
+                    Text(
+                        text = "Riwayat Chat 💬",
+                        fontFamily = PoppinsFont,
+                        fontWeight = FontWeight.Bold,
+                        color = TextWhite,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 20.dp)
+                    )
 
-                // Tombol Tips Tidur Sehat
-                OutlinedButton(
-                    onClick = { },
-                    shape = CircleShape,
-                    border = BorderStroke(1.dp, TextGray),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent)
-                ) {
-                    Icon(Icons.Filled.Favorite, contentDescription = null, tint = Color(0xFFFFEB3B), modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Tips tidur sehat", fontFamily = PoppinsFont, color = TextWhite, fontSize = 12.sp)
-                }
-            }
+                    // Tombol Buat Chat Baru
+                    Button(
+                        onClick = {
+                            viewModel.startNewSession()
+                            scope.launch { drawerState.close() } // Tutup laci setelah klik obrolan baru
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = UserBubbleColor),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                    ) {
+                        Text(text = "+ Chat Baru", fontFamily = PoppinsFont, color = TextWhite)
+                    }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    // Daftar Sesi Chat Lama
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(allSessions) { sessionId ->
+                            val isSelected = sessionId == currentSessionId
 
-            // Tombol Lainnya (Tengah)
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                OutlinedButton(
-                    onClick = { },
-                    shape = CircleShape,
-                    border = BorderStroke(1.dp, TextGray),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = CardColor),
-                    modifier = Modifier.width(160.dp)
-                ) {
-                    Text("Lainnya", fontFamily = PoppinsFont, color = TextWhite, fontSize = 14.sp)
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) UserBubbleColor.copy(alpha = 0.2f) else CardColor
+                                ),
+                                border = if (isSelected) BorderStroke(1.dp, UserBubbleColor) else null,
+                                onClick = {
+                                    viewModel.switchSession(sessionId)
+                                    scope.launch { drawerState.close() } // Tutup laci setelah memilih sesi lama
+                                }
+                            ) {
+                                Text(
+                                    text = "Obrolan ${sessionId.take(6)}...", // Potong ID unik agar ringkas di layar sidebar
+                                    fontFamily = PoppinsFont,
+                                    color = TextWhite,
+                                    modifier = Modifier.padding(14.dp),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        // --- BOTTOM BAR (Kotak Prompt Mengambang / Kapsul) ---
-        Row(
+    ) {
+        // ISI KONTEN CHAT UTAMA
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding() // Menghindari garis navigasi HP (home screen indicator)
-                .imePadding() // Otomatis naik kalau keyboard muncul
-                .padding(horizontal = 16.dp, vertical = 24.dp) // PADDING LUAR: Memberi efek mengambang (margin)
-                .background(
-                    color = Color(0xFF5E5686),
-                    shape = CircleShape // SHAPE: Membuat bentuk melingkar penuh (kapsul)
-                )
-                .padding(horizontal = 8.dp, vertical = 8.dp), // PADDING DALAM: Jarak antara ikon dengan tepi kapsul
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .background(BackgroundColor)
         ) {
-            // Icon Attachment (Klip/Tambah)
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Attach",
-                    tint = TextWhite
-                )
-            }
-
-            // Teks Placeholder Obrolan
-            Text(
-                text = "Mulai Obrolan!",
-                fontFamily = PoppinsFont,
-                color = TextWhite,
-                fontSize = 16.sp,
+            Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 8.dp)
-            )
-
-            // Tombol Kirim / Mic (Warna terang dengan ikon gelap)
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE2DFEB)), // Warna bulatan abu-abu terang
-                contentAlignment = Alignment.Center
+                    .statusBarsPadding()
+                    .padding(horizontal = 24.dp)
             ) {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Filled.Send,
-                        contentDescription = "Send",
-                        tint = Color(0xFF1A153A) // Warna ikon gelap agar kontras
+                // --- TOP BAR BARU ---
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 1. KIRI: Mengaktifkan klik Menu Hamburger
+                    IconButton(
+                        onClick = {
+                            scope.launch { drawerState.open() } // Perintah membuka laci riwayat chat
+                        },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(CardColor, CircleShape)
+                    ) {
+                        Icon(imageVector = Icons.Rounded.Menu, contentDescription = "History Menu", tint = TextWhite, modifier = Modifier.size(20.dp))
+                    }
+
+                    // 2. TENGAH: Judul Halaman
+                    Text(
+                        text = "CherryAI",
+                        fontFamily = PoppinsFont,
+                        fontWeight = FontWeight.Bold,
+                        color = TextWhite,
+                        fontSize = 18.sp
                     )
+
+                    // 3. KANAN: Spacer Kosong sebagai penyeimbang layout Flexbox SpaceBetween
+                    Spacer(modifier = Modifier.size(40.dp))
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Tampilan jika Chat Masih Kosong
+                if (chatHistory.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.AutoAwesome,
+                            contentDescription = "AI Sparkle",
+                            tint = UserBubbleColor,
+                            modifier = Modifier.size(48.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "Halo! Aku CherryAI.",
+                            fontFamily = PoppinsFont,
+                            fontWeight = FontWeight.Bold,
+                            color = TextWhite,
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp),
+                            colors = CardDefaults.cardColors(containerColor = CardColor.copy(alpha = 0.6f)),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+                        ) {
+                            Column(modifier = Modifier.padding(24.dp)) {
+                                Text(
+                                    text = "Rekomendasi Harianmu ✨",
+                                    fontFamily = PoppinsFont,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextWhite,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = "Tidurmu semalam baru dimulai pukul 01.30. Coba targetkan jam 22.30 malam ini ya. Aku mendeteksi sedikit pola stres akhir-akhir ini. Gimana kalau malam ini ditemani musik relaksasi dan teknik napas 4-7-8?",
+                                    fontFamily = PoppinsFont,
+                                    color = TextGray,
+                                    fontSize = 14.sp,
+                                    lineHeight = 22.sp
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    // Tampilan Riwayat Chat
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(chatHistory) { message ->
+                            val isUser = message.isFromUser
+
+                            val bubbleShape = if (isUser) {
+                                RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 4.dp)
+                            } else {
+                                RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 4.dp, bottomEnd = 20.dp)
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .widthIn(max = 280.dp)
+                                        .background(
+                                            color = if (isUser) UserBubbleColor else CardColor,
+                                            shape = bubbleShape
+                                        )
+                                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                                ) {
+                                    Text(
+                                        text = formatMarkdownText(message.text),
+                                        color = TextWhite,
+                                        fontFamily = PoppinsFont,
+                                        fontSize = 14.sp,
+                                        lineHeight = 22.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // --- BOTTOM BAR BARU (TIDAK ADA TOMBOL +) ---
+            Surface(
+                color = BackgroundColor,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .imePadding()
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .background(CardColor, CircleShape)
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BasicTextField(
+                        value = inputText,
+                        onValueChange = { viewModel.updateInputText(it) },
+                        textStyle = TextStyle(
+                            fontFamily = PoppinsFont,
+                            color = TextWhite,
+                            fontSize = 15.sp
+                        ),
+                        cursorBrush = SolidColor(UserBubbleColor),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp), // Menyesuaikan padding agar teks presisi setelah tombol kiri hilang
+                        decorationBox = { innerTextField ->
+                            if (inputText.isEmpty()) {
+                                Text(
+                                    text = "Ketik sesuatu...",
+                                    fontFamily = PoppinsFont,
+                                    color = TextGray,
+                                    fontSize = 15.sp
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+
+                    IconButton(
+                        onClick = { viewModel.sendMessage() },
+                        modifier = Modifier
+                            .size(44.dp)
+                            .background(if (inputText.isNotBlank()) UserBubbleColor else Color(0xFF5A5086), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Send,
+                            contentDescription = "Send",
+                            tint = TextWhite,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun formatMarkdownText(text: String): AnnotatedString {
+    return buildAnnotatedString {
+        val parts = text.split("**")
+        for (i in parts.indices) {
+            if (i % 2 != 0) {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(parts[i])
+                }
+            } else {
+                append(parts[i])
             }
         }
     }
