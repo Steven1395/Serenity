@@ -9,7 +9,6 @@ import com.example.serenity.data.journal.JournalEntity
 import com.example.serenity.data.journal.JournalRepository
 import com.example.serenity.data.journal.SleepEntity
 import com.example.serenity.data.natunai.ChatEntity
-import com.google.ai.client.generativeai.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.Job

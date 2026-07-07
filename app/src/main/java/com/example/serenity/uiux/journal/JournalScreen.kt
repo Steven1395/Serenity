@@ -102,7 +102,8 @@ fun JournalScreen(
                 verticalAlignment = Alignment.Bottom
             ) {
                 daysOfWeek.forEach { day ->
-                    val matchedEntity = chartData.lastOrNull { it.dayName.equals(day, ignoreCase = true) }
+                    // PERBAIKAN 1: Menggunakan startsWith agar lebih kebal error spasi/titik
+                    val matchedEntity = chartData.lastOrNull { it.dayName.startsWith(day, ignoreCase = true) }
                     val scorePercentage = if (matchedEntity != null) {
                         (matchedEntity.score * 100).toInt().coerceIn(0, 100)
                     } else { 0 }
@@ -247,7 +248,8 @@ fun JournalScreen(
                 verticalAlignment = Alignment.Bottom
             ) {
                 daysOfWeek.forEach { day ->
-                    val matchedEntity = sleepData.lastOrNull { it.dayName.equals(day, ignoreCase = true) }
+                    // PERBAIKAN 2: Menggunakan startsWith
+                    val matchedEntity = sleepData.lastOrNull { it.dayName.startsWith(day, ignoreCase = true) }
                     val sleepVal = matchedEntity?.sleepHours ?: 0f
                     val maxSleep = 12f // Tinggi maksimal batang diset untuk 12 Jam
 
@@ -304,7 +306,8 @@ fun JournalScreen(
                 verticalAlignment = Alignment.Bottom
             ) {
                 daysOfWeek.forEach { day ->
-                    val matchedEntity = sleepData.lastOrNull { it.dayName.equals(day, ignoreCase = true) }
+                    // PERBAIKAN 3: Menggunakan startsWith
+                    val matchedEntity = sleepData.lastOrNull { it.dayName.startsWith(day, ignoreCase = true) }
                     val screenVal = matchedEntity?.screenTimeHours ?: 0f
                     val maxScreen = 8f // Tinggi maksimal batang diset untuk 8 Jam
 

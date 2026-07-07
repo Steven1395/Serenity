@@ -18,7 +18,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.serenity.R
 import com.example.serenity.viewmodel.journal.JournalViewModel
 import com.example.serenity.viewmodel.SleepViewModel
-import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun QuestionnaireScreen(
@@ -216,13 +218,15 @@ fun QuestionnaireScreen(
                     } else if (sleepHours < 6f || screenTimeHours >= 8f) {
                         "Buruk" // Kurang tidur kronis ATAU screen time sangat parah
                     } else {
-                        "Buruk" // Sisanya (misal tidur 6.5 jam tapi screen time 7 jam) dikategorikan kurang sehat (Pink di UI)
+                        "Buruk" // Sisanya dikategorikan kurang sehat
                     }
 
-                    // C. Dapatkan singkatan hari dinamis
-                    val calendar = Calendar.getInstance()
-                    val daysArray = arrayOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab")
-                    val todayName = daysArray[calendar.get(Calendar.DAY_OF_WEEK) - 1]
+                    // C. DAPATKAN SINGKATAN HARI YANG SERAGAM DENGAN VIEWMODEL (PERBAIKAN)
+                    val dayFormat = SimpleDateFormat("EEE", Locale("id", "ID"))
+                    val rawDayName = dayFormat.format(Date()).replace(".", "").take(3)
+                    val todayName = rawDayName.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                    }
 
                     // D. Simpan data tidur
                     sleepViewModel.saveSleepData(
