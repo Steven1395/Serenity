@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class SleepEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: String,
     val dayName: String,          // Contoh: "Sen", "Sel"
     val sleepHours: Float,        // Dari Slider 1
     val screenTimeHours: Float,   // Dari Slider 2

@@ -10,21 +10,23 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface JournalDao {
 
-    // Hanya ambil maksimal 7 data terbaru untuk keperluan grafik mingguan
-    @Query("SELECT * FROM table_journal ORDER BY id DESC LIMIT 7")
-    fun getLast7DaysScores(): Flow<List<JournalEntity>>
+    // 🌟 Ubah query dan tambah parameter userId
+    @Query("SELECT * FROM table_journal WHERE userId = :userId ORDER BY id DESC LIMIT 7")
+    fun getLast7DaysScores(userId: String): Flow<List<JournalEntity>>
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertJournal(journal: JournalEntity): Long
 
-    @Query("DELETE FROM table_journal WHERE id = :journalId")
-    suspend fun deleteJournalById(journalId: Int): Int
+    // 🌟 (Opsional tapi disarankan) Filter juga pakai userId agar tidak salah hapus punya orang
+    @Query("DELETE FROM table_journal WHERE id = :journalId AND userId = :userId")
+    suspend fun deleteJournalById(journalId: Int, userId: String): Int
 
-    // --- TAMBAHAN BARU: Menghapus data berdasarkan nama hari ---
-    @Query("DELETE FROM table_journal WHERE dayName = :targetDay")
-    suspend fun deleteDataByDay(targetDay: String)
+    // 🌟 Tambah parameter userId
+    @Query("DELETE FROM table_journal WHERE dayName = :targetDay AND userId = :userId")
+    suspend fun deleteDataByDay(targetDay: String, userId: String)
 
-    // Mengambil 1 data kuesioner paling baru untuk dibaca AI
-    @Query("SELECT * FROM table_journal ORDER BY id DESC LIMIT 1")
-    fun getLatestJournal(): kotlinx.coroutines.flow.Flow<JournalEntity?>
+    // 🌟 Tambah parameter userId
+    @Query("SELECT * FROM table_journal WHERE userId = :userId ORDER BY id DESC LIMIT 1")
+    fun getLatestJournal(userId: String): kotlinx.coroutines.flow.Flow<JournalEntity?>
+// ...
 }

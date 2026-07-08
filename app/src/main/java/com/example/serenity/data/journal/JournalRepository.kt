@@ -7,24 +7,28 @@ class JournalRepository(
     private val journalDao: JournalDao,
     private val sleepDao: SleepDao
 ) {
-    val last7DaysScores: Flow<List<JournalEntity>> = journalDao.getLast7DaysScores()
-
-    // --- FUNGSI BARU: Mengambil 1 data tidur terbaru untuk CherryAI ---
-    fun getLatestSleepData(): Flow<SleepEntity?> {
-        return sleepDao.getLatestSleep()
-        // Catatan: Pastikan di dalam file SleepDao milikmu sudah ada fungsi getLatestSleep() ya!
+    // 🌟 UBAH DARI 'val' MENJADI 'fun' agar bisa menerima parameter userId
+    fun getLast7DaysScores(userId: String): Flow<List<JournalEntity>> {
+        return journalDao.getLast7DaysScores(userId)
     }
 
-    // Mengambil 1 data kuesioner psikologis terbaru
-    fun getLatestJournalData(): Flow<JournalEntity?> {
-        return journalDao.getLatestJournal()
+    // 🌟 Tambah parameter userId
+    fun getLatestSleepData(userId: String): Flow<SleepEntity?> {
+        return sleepDao.getLatestSleep(userId)
     }
 
+    // 🌟 Tambah parameter userId
+    fun getLatestJournalData(userId: String): Flow<JournalEntity?> {
+        return journalDao.getLatestJournal(userId)
+    }
+
+    // (Insert tidak perlu diubah karena objek entity-nya nanti sudah bawa userId dari ViewModel)
     suspend fun insert(journal: JournalEntity): Long {
         return journalDao.insertJournal(journal)
     }
 
-    suspend fun deleteDataByDay(dayName: String) {
-        journalDao.deleteDataByDay(dayName)
+    // 🌟 Tambah parameter userId
+    suspend fun deleteDataByDay(dayName: String, userId: String) {
+        journalDao.deleteDataByDay(dayName, userId)
     }
 }

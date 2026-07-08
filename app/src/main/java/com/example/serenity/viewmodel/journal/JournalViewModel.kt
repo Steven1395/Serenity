@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.serenity.data.AppDatabase
 import com.example.serenity.data.journal.JournalEntity
 import com.example.serenity.data.journal.JournalRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -20,6 +21,10 @@ class JournalViewModel(application: Application) : AndroidViewModel(application)
     private val repository: JournalRepository
     val chartScoresProvider: StateFlow<List<JournalEntity>>
 
+    // 🌟 Ambil UID user yang sedang login saat ini (Jika gagal, default ke "anonymous")
+    private val currentUserId: String
+        get() = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
+
     init {
         // 1. Panggil databasenya dulu
         val database = AppDatabase.getDatabase(application)
@@ -32,7 +37,8 @@ class JournalViewModel(application: Application) : AndroidViewModel(application)
         repository = JournalRepository(journalDao, sleepDao)
 
         // Membalikkan urutan data (reversed) agar urutan hari kronologis dari kiri ke kanan di grafik
-        chartScoresProvider = repository.last7DaysScores
+        // 🌟 Tambahkan currentUserId ke dalam fungsi pemanggilan repository
+        chartScoresProvider = repository.getLast7DaysScores(currentUserId)
             .map { it.reversed() }
             .stateIn(
                 scope = viewModelScope,
@@ -44,8 +50,16 @@ class JournalViewModel(application: Application) : AndroidViewModel(application)
     fun addMockScore(dayName: String, score: Float) {
         viewModelScope.launch {
             val timestamp = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-            // Ditambahkan parameter notes default agar fungsi dummy/mock ini tidak error
-            repository.insert(JournalEntity(dayName = dayName, score = score, date = timestamp, notes = "Data uji coba (mock)"))
+            // 🌟 Masukkan currentUserId saat menyimpan data mock
+            repository.insert(
+                JournalEntity(
+                    userId = currentUserId,
+                    dayName = dayName,
+                    score = score,
+                    date = timestamp,
+                    notes = "Data uji coba (mock)"
+                )
+            )
         }
     }
 
@@ -101,15 +115,17 @@ class JournalViewModel(application: Application) : AndroidViewModel(application)
             val timestamp = dateFormat.format(Date())
 
             // 1. Hapus data kuesioner lama di hari yang sama agar tidak menumpuk (duplikat)
-            repository.deleteDataByDay(currentDay)
+            // 🌟 Tambahkan currentUserId sebagai target penghapusan
+            repository.deleteDataByDay(currentDay, currentUserId)
 
             // 2. Masukkan data baru ke database Room beserta Catatan Ringkasan untuk AI
             repository.insert(
                 JournalEntity(
+                    userId = currentUserId, // 🌟 Tambahkan currentUserId saat menyimpan
                     dayName = currentDay,
                     score = calculatedScore,
                     date = timestamp,
-                    notes = catatanAi // <-- Sekarang sudah sukses menyetorkan teks ke database!
+                    notes = catatanAi
                 )
             )
         }

@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class ChatEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: String,
     val text: String,
     val isFromUser: Boolean,
     val timestamp: Long = System.currentTimeMillis(), // Untuk mengurutkan chat lama ke baru

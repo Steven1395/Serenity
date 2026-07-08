@@ -10,15 +10,15 @@ interface SleepDao {
     @Insert
     suspend fun insertSleepData(sleepEntity: SleepEntity)
 
-    // Mengambil 7 data terakhir untuk grafik mingguan
-    @Query("SELECT * FROM sleep_journal ORDER BY timestamp DESC LIMIT 7")
-    fun getRecentSleepData(): Flow<List<SleepEntity>>
+    // 🌟 Tambah parameter userId
+    @Query("SELECT * FROM sleep_journal WHERE userId = :userId ORDER BY timestamp DESC LIMIT 7")
+    fun getRecentSleepData(userId: String): Flow<List<SleepEntity>>
 
-    // Menghapus data lama di hari yang sama agar tidak duplikat
-    @Query("DELETE FROM sleep_journal WHERE dayName = :targetDay")
-    suspend fun deleteDataByDay(targetDay: String)
+    // 🌟 Tambah parameter userId
+    @Query("DELETE FROM sleep_journal WHERE dayName = :targetDay AND userId = :userId")
+    suspend fun deleteDataByDay(targetDay: String, userId: String)
 
-    // Mengambil 1 data tidur paling baru untuk dianalisis oleh CherryAI
-    @Query("SELECT * FROM sleep_journal ORDER BY timestamp DESC LIMIT 1")
-    fun getLatestSleep(): Flow<SleepEntity?>
+    // 🌟 Tambah parameter userId
+    @Query("SELECT * FROM sleep_journal WHERE userId = :userId ORDER BY timestamp DESC LIMIT 1")
+    fun getLatestSleep(userId: String): Flow<SleepEntity?>
 }

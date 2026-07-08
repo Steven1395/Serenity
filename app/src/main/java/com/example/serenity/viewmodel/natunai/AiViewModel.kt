@@ -11,6 +11,7 @@ import com.example.serenity.data.journal.SleepEntity
 import com.example.serenity.data.natunai.ChatEntity
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
+import com.google.firebase.auth.FirebaseAuth // 🌟 Tambahan Import Firebase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,10 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
     private val database = AppDatabase.getDatabase(application)
     private val repository = JournalRepository(database.journalDao(), database.sleepDao())
     private val chatDao = database.chatDao()
+
+    // 🌟 Ambil UID user yang sedang login saat ini dari Firebase
+    private val currentUserId: String
+        get() = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
 
     // State Sesi Aktif
     private val _currentSessionId = MutableStateFlow("")
@@ -46,9 +51,10 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
     private var currentChatJob: Job? = null // Job untuk memantau chat secara real-time
 
     init {
-        // 1. Ambil daftar semua sesi yang pernah ada di database
+        // 1. Ambil daftar semua sesi yang pernah ada di database berdasarkan User ID
         viewModelScope.launch {
-            chatDao.getAllSessions().collect { sessions ->
+            // 🌟 Mengoper currentUserId ke DAO agar list sesi di menu hamburger tidak bercampur antar akun
+            chatDao.getAllSessions(currentUserId).collect { sessions ->
                 _allSessions.value = sessions
 
                 // Jika aplikasi baru dibuka dan belum memilih sesi, muat sesi terakhir (paling baru)
@@ -64,7 +70,8 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
 
         // Ambil data tidur secara real-time
         viewModelScope.launch {
-            repository.getLatestSleepData().collect { sleepData ->
+            // 🌟 Memasukkan currentUserId sesuai perubahan pada JournalRepository sebelumnya
+            repository.getLatestSleepData(currentUserId).collect { sleepData ->
                 latestSleepSession = sleepData
                 updateDailyRecommendation()
             }
@@ -72,7 +79,8 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
 
         // Ambil data kuesioner secara real-time
         viewModelScope.launch {
-            repository.getLatestJournalData().collect { journalData ->
+            // 🌟 Memasukkan currentUserId sesuai perubahan pada JournalRepository sebelumnya
+            repository.getLatestJournalData(currentUserId).collect { journalData ->
                 latestJournalSession = journalData
                 updateDailyRecommendation()
             }
@@ -92,7 +100,8 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
 
         // Mulai pantau data chat dari sesi yang baru dipilih
         currentChatJob = viewModelScope.launch {
-            chatDao.getChatsBySession(sessionId).collect { list ->
+            // 🌟 Tambahkan currentUserId di sini sebagai parameter kedua
+            chatDao.getChatsBySession(sessionId, currentUserId).collect { list ->
                 _chatHistory.value = list
             }
         }
@@ -143,6 +152,7 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
 
             viewModelScope.launch {
                 val userChat = ChatEntity(
+                    userId = currentUserId, // 🌟 Masukkan ID user saat menyimpan chat pengguna
                     text = currentText,
                     isFromUser = true,
                     sessionId = _currentSessionId.value
@@ -159,6 +169,7 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
             val aiReplyText = response.text ?: "Maaf, ada gangguan pada sistem CherryAI."
 
             val aiChat = ChatEntity(
+                userId = currentUserId, // 🌟 Masukkan ID user saat menyimpan balasan AI
                 text = aiReplyText,
                 isFromUser = false,
                 sessionId = _currentSessionId.value
@@ -167,6 +178,7 @@ class AiViewModel(application: Application) : AndroidViewModel(application) {
 
         } catch (e: Exception) {
             val errorChat = ChatEntity(
+                userId = currentUserId, // 🌟 Masukkan ID user saat menyimpan pesan error
                 text = "Error: ${e.localizedMessage}",
                 isFromUser = false,
                 sessionId = _currentSessionId.value
