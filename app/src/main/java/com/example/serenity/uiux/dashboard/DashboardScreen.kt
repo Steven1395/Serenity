@@ -307,11 +307,6 @@ fun DashboardFeatureCard(
     }
 }
 
-// =====================================================================================
-// MENU ITEM (daftar sekunder: Pengaturan, Bantuan, Tentang Kami)
-// Signature & parameter SAMA PERSIS seperti kode original — hanya bagian visual
-// di dalam body-nya yang didesain ulang
-// =====================================================================================
 @Composable
 fun DashboardMenuItem(icon: ImageVector, title: String, onClick: () -> Unit) {
     Row(
