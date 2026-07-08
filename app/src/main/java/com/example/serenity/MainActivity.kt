@@ -10,7 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.serenity.ui.theme.SerenityTheme
-import com.example.serenity.uiux.navigation.SerenityApp // Pastikan ini ter-import
+import com.example.serenity.uiux.navigation.SerenityApp
+import com.example.serenity.uiux.navigation.Screen // WAJIB DI-IMPORT AGAR BISA MEMBACA Screen.Landing.route
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +22,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
 
-                        SerenityApp()
+                        // Biarkan aplikasi selalu mulai dari Landing Screen secara default.
+                        // Pengecekan Kuesioner/Dashboard akan otomatis berjalan SETELAH user berhasil Login.
+                        SerenityApp(startDestination = Screen.Landing.route)
 
                     }
                 }

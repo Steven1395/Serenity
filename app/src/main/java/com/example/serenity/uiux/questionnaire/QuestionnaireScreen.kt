@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.serenity.R
+import com.example.serenity.utils.DailyChecker
 import com.example.serenity.viewmodel.journal.JournalViewModel
 import com.example.serenity.viewmodel.SleepViewModel
 import java.text.SimpleDateFormat
@@ -28,6 +30,10 @@ fun QuestionnaireScreen(
     viewModel: JournalViewModel = viewModel(),
     sleepViewModel: SleepViewModel = viewModel()
 ) {
+    // Mengambil konteks Android untuk SharedPreferences melalui DailyChecker
+    val context = LocalContext.current
+    val dailyChecker = remember { DailyChecker(context) }
+
     val DeepPurple = Color(0xFF422C73)
     val LightPurple = Color(0xFF9279F8)
     val PinkHighlight = Color(0xFFE91E63)
@@ -76,6 +82,7 @@ fun QuestionnaireScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            // PERBAIKAN 1: Menggunakan questions[currentQuestionIndex] agar teks berubah
             Text(
                 text = questions[currentQuestionIndex],
                 fontFamily = PoppinsFont,
@@ -181,7 +188,8 @@ fun QuestionnaireScreen(
 
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                 Text(text = "Berapa jam kamu tidur semalam?", fontFamily = PoppinsFont, color = DeepPurple, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                Text(text = String.format("%.1f Jam", sleepHours), fontFamily = PoppinsFont, color = LightPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                // PERBAIKAN 2: Menambahkan Locale.getDefault() agar tidak muncul garis kuning di Android Studio
+                Text(text = String.format(Locale.getDefault(), "%.1f Jam", sleepHours), fontFamily = PoppinsFont, color = LightPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Slider(
                     value = sleepHours,
                     onValueChange = { sleepHours = it },
@@ -195,7 +203,8 @@ fun QuestionnaireScreen(
 
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                 Text(text = "Berapa jam main HP sebelum tidur?", fontFamily = PoppinsFont, color = DeepPurple, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                Text(text = String.format("%.1f Jam", screenTimeHours), fontFamily = PoppinsFont, color = PinkHighlight, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                // PERBAIKAN 2: Menambahkan Locale.getDefault()
+                Text(text = String.format(Locale.getDefault(), "%.1f Jam", screenTimeHours), fontFamily = PoppinsFont, color = PinkHighlight, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Slider(
                     value = screenTimeHours,
                     onValueChange = { screenTimeHours = it },
@@ -209,26 +218,20 @@ fun QuestionnaireScreen(
 
             Button(
                 onClick = {
-                    // A. Simpan data kuesioner psikologis dengan logika baru
                     viewModel.saveRealQuestionnaireResult(answers.toList())
 
-                    // B. LOGIKA MENGHITUNG KUALITAS TIDUR BERDASARKAN SAINS MEDIS
                     val finalQualityResult = if (sleepHours in 7f..9f && screenTimeHours <= 4f) {
-                        "Bagus" // Tidur ideal dan screen time wajar
-                    } else if (sleepHours < 6f || screenTimeHours >= 8f) {
-                        "Buruk" // Kurang tidur kronis ATAU screen time sangat parah
+                        "Bagus"
                     } else {
-                        "Buruk" // Sisanya dikategorikan kurang sehat
+                        "Buruk"
                     }
 
-                    // C. DAPATKAN SINGKATAN HARI YANG SERAGAM DENGAN VIEWMODEL (PERBAIKAN)
                     val dayFormat = SimpleDateFormat("EEE", Locale("id", "ID"))
                     val rawDayName = dayFormat.format(Date()).replace(".", "").take(3)
                     val todayName = rawDayName.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
                     }
 
-                    // D. Simpan data tidur
                     sleepViewModel.saveSleepData(
                         dayName = todayName,
                         sleepHours = sleepHours,
@@ -236,7 +239,8 @@ fun QuestionnaireScreen(
                         sleepQuality = finalQualityResult
                     )
 
-                    // E. Navigasi Selesai ke Dashboard
+                    dailyChecker.markAsFilledToday()
+
                     onFinished()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = DeepPurple),

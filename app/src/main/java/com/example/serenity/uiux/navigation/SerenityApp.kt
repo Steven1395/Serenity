@@ -1,6 +1,8 @@
 package com.example.serenity.uiux.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -15,12 +17,21 @@ import com.example.serenity.uiux.questionnaire.QuestionnaireScreen
 import com.example.serenity.uiux.journal.JournalScreen
 import com.example.serenity.uiux.music.MusicScreen
 import com.example.serenity.uiux.natunai.AiScreen
+import com.example.serenity.utils.DailyChecker // 1. IMPORT DAILYCHECKER KAMU
 
 @Composable
-fun SerenityApp() {
+fun SerenityApp(
+    // PERBAIKAN A: Tambahkan parameter startDestination agar fleksibel dikontrol dari MainActivity
+    // Nilai default-nya tetap Landing jika tidak dikirim dari MainActivity
+    startDestination: String = Screen.Landing.route
+) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.Landing.route) {
+    // Siapkan dailyChecker untuk mengecek status pengisian kuesioner hari ini
+    val context = LocalContext.current
+    val dailyChecker = remember { DailyChecker(context) }
+
+    NavHost(navController = navController, startDestination = startDestination) {
 
         composable(Screen.Landing.route) {
             LandingScreen(onGetStartedClick = { navController.navigate(Screen.Login.route) })
@@ -29,7 +40,14 @@ fun SerenityApp() {
         composable(Screen.Login.route) {
             LogInScreen(
                 onLoginSuccess = {
-                    navController.navigate(Screen.Questionnaire.route) {
+                    // PERBAIKAN B: Cegat alur setelah login sukses menggunakan DailyChecker
+                    val ruteTujuan = if (dailyChecker.isAlreadyFilledToday()) {
+                        Screen.Dashboard.route // Jika sudah isi hari ini, langsung ke Dashboard
+                    } else {
+                        Screen.Questionnaire.route // Jika belum isi, wajib kuesioner dulu
+                    }
+
+                    navController.navigate(ruteTujuan) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
@@ -43,7 +61,6 @@ fun SerenityApp() {
             SignInScreen(
                 onContinueClick = {
                     navController.navigate(Screen.Login.route) {
-                        // Menghapus riwayat Sign In agar ketika di halaman Login user menekan back, aplikasi langsung keluar
                         popUpTo(Screen.SignIn.route) { inclusive = true }
                     }
                 }
@@ -70,11 +87,10 @@ fun SerenityApp() {
                 onNavigateToMusic = { navController.navigate(Screen.Music.route) },
                 onNavigateToAi = { navController.navigate(Screen.Ai.route) },
                 onNavigateToJournal = { navController.navigate(Screen.Journal.route) },
-                onNavigateToQuestionnaire = { navController.navigate(Screen.Questionnaire.route) }
+                onNavigateToQuestionnaire = { navController.navigate(Screen.Questionnaire.route) } // Tetap bisa diakses manual jika user ingin mengulang
             )
         }
 
-        // Pakai popBackStack() untuk tombol kembali yang natural
         composable(Screen.Music.route) {
             MusicScreen(onNavigateBack = { navController.popBackStack() })
         }
